@@ -18,6 +18,14 @@ module.exports = (env) => {
           test: /\.css$/,
           use: [isProd ? MiniCssExtractPlugin.loader : "style-loader", "css-loader"],
         },
+        {
+          test: /\.svg$/i,
+          type: "asset/resource",
+        },
+        {
+          test: /\.(woff|woff2|eot|ttf|otf|png|jpg|jpeg|webp)$/i,
+          type: "asset/resource",
+        },
       ],
     },
     plugins: [

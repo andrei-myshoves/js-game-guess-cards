@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 module.exports = (env) => {
   const isProd = env.mode === "production";
@@ -52,5 +53,9 @@ module.exports = (env) => {
       open: true,
     },
     devtool: isProd ? "source-map" : "eval-source-map",
+    optimization: {
+      minimize: isProd,
+      minimizer: ["...", new CssMinimizerPlugin()],
+    },
   };
 };

@@ -12,6 +12,7 @@
   "description": "",
   "devDependencies": {
     "css-loader": "^7.1.2",
+    "css-minimizer-webpack-plugin": "^7.0.2",
     "html-webpack-plugin": "^5.5.3",
     "mini-css-extract-plugin": "^2.9.4",
     "style-loader": "^4.0.0",

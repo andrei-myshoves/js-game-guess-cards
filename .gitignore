@@ -1,2 +1,4 @@
 # node_modules - папка с зависимостями
 node_modules/
+
+/build

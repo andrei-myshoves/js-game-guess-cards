@@ -16,7 +16,18 @@ module.exports = (env) => {
       rules: [
         {
           test: /\.css$/,
-          use: [isProd ? MiniCssExtractPlugin.loader : "style-loader", "css-loader"],
+          use: [
+            isProd ? MiniCssExtractPlugin.loader : "style-loader",
+            {
+              loader: "css-loader",
+              options: {
+                modules: {
+                  auto: true,
+                  localIdentName: "[name]__[local]___[hash:base64:5]",
+                },
+              },
+            },
+          ],
         },
         {
           test: /\.svg$/i,
@@ -32,5 +43,14 @@ module.exports = (env) => {
       new HtmlWebpackPlugin({ template: path.resolve(__dirname, "public", "index.html") }),
       ...(isProd ? [new MiniCssExtractPlugin({ filename: "[name].[contenthash].css" })] : []),
     ],
+    devServer: {
+      static: {
+        directory: path.resolve(__dirname, "public"),
+      },
+      hot: true,
+      port: 3000,
+      open: true,
+    },
+    devtool: isProd ? "source-map" : "eval-source-map",
   };
 };

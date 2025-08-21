@@ -15,18 +15,30 @@ module.exports = (env) => {
     },
     module: {
       rules: [
+        // CSS Modules только для *.module.css
         {
-          test: /\.css$/,
+          test: /\.module\.css$/i,
           use: [
             isProd ? MiniCssExtractPlugin.loader : "style-loader",
             {
               loader: "css-loader",
               options: {
                 modules: {
-                  auto: true,
                   localIdentName: "[name]__[local]___[hash:base64:5]",
                 },
               },
+            },
+          ],
+        },
+        // Глобальные стили для остальных .css
+        {
+          test: /\.css$/i,
+          exclude: /\.module\.css$/i,
+          use: [
+            isProd ? MiniCssExtractPlugin.loader : "style-loader",
+            {
+              loader: "css-loader",
+              options: { modules: false },
             },
           ],
         },
@@ -52,7 +64,7 @@ module.exports = (env) => {
       port: 3000,
       open: true,
     },
-    devtool: isProd ? "source-map" : "eval-source-map",
+    devtool: isProd ? false : "source-map",
     optimization: {
       minimize: isProd,
       minimizer: ["...", new CssMinimizerPlugin()],

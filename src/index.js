@@ -1,5 +1,6 @@
 import "./style.css";
 import bird from "../src/img/Picture-bird.webp";
+import iconSVG from "../src/img/Bag.svg";
 
 import * as styles from "./index.module.css";
 
@@ -17,3 +18,7 @@ img.src = bird;
 img.alt = "Bird";
 img.width = 200;
 root.appendChild(img);
+
+const svgContainer = document.createElement("div");
+svgContainer.innerHTML = iconSVG;
+root.appendChild(svgContainer);

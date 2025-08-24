@@ -1,16 +1,16 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 module.exports = (env) => {
-  const isProd = env.mode === "production";
+  const isProd = env.mode === 'production';
   return {
-    mode: env.mode ?? "development",
-    entry: path.resolve(__dirname, "src", "index.js"),
+    mode: env.mode ?? 'development',
+    entry: path.resolve(__dirname, 'src', 'index.js'),
     output: {
-      path: path.resolve(__dirname, "build"),
-      filename: "[name].[contenthash].js",
+      path: path.resolve(__dirname, 'build'),
+      filename: '[name].[contenthash].js',
       clean: true,
     },
     module: {
@@ -19,12 +19,12 @@ module.exports = (env) => {
         {
           test: /\.module\.css$/i,
           use: [
-            isProd ? MiniCssExtractPlugin.loader : "style-loader",
+            isProd ? MiniCssExtractPlugin.loader : 'style-loader',
             {
-              loader: "css-loader",
+              loader: 'css-loader',
               options: {
                 modules: {
-                  localIdentName: "[name]__[local]___[hash:base64:5]",
+                  localIdentName: '[name]__[local]___[hash:base64:5]',
                 },
               },
             },
@@ -35,39 +35,39 @@ module.exports = (env) => {
           test: /\.css$/i,
           exclude: /\.module\.css$/i,
           use: [
-            isProd ? MiniCssExtractPlugin.loader : "style-loader",
+            isProd ? MiniCssExtractPlugin.loader : 'style-loader',
             {
-              loader: "css-loader",
+              loader: 'css-loader',
               options: { modules: false },
             },
           ],
         },
         {
           test: /\.svg$/i,
-          type: "asset/source",
+          type: 'asset/source',
         },
         {
           test: /\.(woff|woff2|eot|ttf|otf|png|jpg|jpeg|webp)$/i,
-          type: "asset/resource",
+          type: 'asset/resource',
         },
       ],
     },
     plugins: [
-      new HtmlWebpackPlugin({ template: path.resolve(__dirname, "public", "index.html") }),
-      ...(isProd ? [new MiniCssExtractPlugin({ filename: "[name].[contenthash].css" })] : []),
+      new HtmlWebpackPlugin({ template: path.resolve(__dirname, 'public', 'index.html') }),
+      ...(isProd ? [new MiniCssExtractPlugin({ filename: '[name].[contenthash].css' })] : []),
     ],
     devServer: {
       static: {
-        directory: path.resolve(__dirname, "public"),
+        directory: path.resolve(__dirname, 'public'),
       },
       hot: true,
       port: 3000,
       open: true,
     },
-    devtool: isProd ? false : "source-map",
+    devtool: isProd ? false : 'source-map',
     optimization: {
       minimize: isProd,
-      minimizer: ["...", new CssMinimizerPlugin()],
+      minimizer: ['...', new CssMinimizerPlugin()],
     },
   };
 };

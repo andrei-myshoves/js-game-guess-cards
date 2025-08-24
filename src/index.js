@@ -1,24 +1,28 @@
-import './style.css'
-import bird from '../src/img/Picture-bird.webp'
-import iconSVG from '../src/img/Bag.svg'
+import { GameMenu } from './components/GameMenu/GameMenu.js'
+import { PageBlock } from './components/PageBlock/PageBlock.js'
 
-import * as styles from './index.module.css'
+function renderPage(page) {
+    const root = document.getElementById('root')
+    switch (page) {
+        case 'main':
+            root.innerHTML = GameMenu()
+            break
+        case 'history':
+            root.innerHTML = PageBlock('Здесь скоро будет история')
+            break
+        case 'block2':
+            root.innerHTML = PageBlock('Содержимое блока 2')
+            break
+        case 'block3':
+            root.innerHTML = PageBlock('Содержимое блока 3')
+            break
+    }
+    localStorage.setItem('currentPage', page)
+}
 
-console.log('CSS Module rrr:', styles.rrr)
+window.setPage = page => {
+    renderPage(page)
+}
 
-const root = document.getElementById('root')
-const app = document.createElement('h1')
-app.textContent = 'Hello World!'
-app.className = styles.rrr
-
-root.appendChild(app)
-
-const img = document.createElement('img')
-img.src = bird
-img.alt = 'Bird'
-img.width = 200
-root.appendChild(img)
-
-const svgContainer = document.createElement('div')
-svgContainer.innerHTML = iconSVG
-root.appendChild(svgContainer)
+const savedPage = localStorage.getItem('currentPage') || 'main'
+renderPage(savedPage)

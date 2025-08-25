@@ -1,13 +1,27 @@
-import styles from './GameMenu.module.css'
+import * as styles from './GameMenu.module.css'
 console.log(styles)
 
+const menuItems = [
+    { id: 'gamePage', text: 'Начать игру' },
+    { id: 'historyPage', text: 'История игр' },
+    { id: 'settingsPage', text: 'Изучить инструкцию' },
+]
+
 export function GameMenu() {
-    return `
+    const html = `
     <div class="${styles.menu}">
       <h1 class="${styles.title}">Главное меню</h1>
-      <button class="${styles.button}" onclick="setPage('history')">История игр</button>
-      <button class="${styles.button}" onclick="setPage('block2')">Начать игру</button>
-      <button class="${styles.button}" onclick="setPage('block3')">Изучить инструкцию</button>
+      ${menuItems.map(item => `<button id="${item.id}" class="${styles.button}">${item.text}</button>`).join('')}
     </div>
   `
+
+    const root = document.getElementById('root')
+    root.innerHTML = html
+
+    menuItems.forEach(item => {
+        const btn = document.getElementById(item.id)
+        btn.addEventListener('click', () => {
+            window.setPage(item.id)
+        })
+    })
 }

@@ -1,4 +1,4 @@
-import styles from './PageBlock.module.css'
+import * as styles from './PageBlock.module.css'
 
 export function PageBlock(title) {
     return `

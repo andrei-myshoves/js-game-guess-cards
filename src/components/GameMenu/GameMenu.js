@@ -1,27 +1,32 @@
 import * as styles from './GameMenu.module.css'
 console.log(styles)
 
-const menuItems = [
-    { id: 'gamePage', text: 'Начать игру' },
-    { id: 'historyPage', text: 'История игр' },
-    { id: 'settingsPage', text: 'Изучить инструкцию' },
+export const menuItems = [
+    { id: 'gamePage', text: 'Начать игру', group: 'top' },
+    { id: 'historyPage', text: 'История игр', group: 'top' },
+    { id: 'settingsPage', text: 'Изучить инструкцию', group: 'bottom' },
 ]
 
 export function GameMenu() {
-    const html = `
-    <div class="${styles.menu}">
-      <h1 class="${styles.title}">Главное меню</h1>
-      ${menuItems.map(item => `<button id="${item.id}" class="${styles.button}">${item.text}</button>`).join('')}
-    </div>
-  `
+    const topButtons = menuItems
+        .filter(item => item.group === 'top')
+        .map(item => `<button id="${item.id}" class="${styles.button}">${item.text}</button>`)
+        .join('')
 
-    const root = document.getElementById('root')
-    root.innerHTML = html
+    const bottomButtons = menuItems
+        .filter(item => item.group === 'bottom')
+        .map(item => `<button id="${item.id}" class="${styles.button}">${item.text}</button>`)
+        .join('')
 
-    menuItems.forEach(item => {
-        const btn = document.getElementById(item.id)
-        btn.addEventListener('click', () => {
-            window.setPage(item.id)
-        })
-    })
+    return `
+        <div class="${styles.menu}">
+            <h1 class="${styles.title}">Главное меню</h1>
+            <div class="${styles.topButtons}">
+                ${topButtons}
+            </div>
+            <div class="${styles.bottomButtons}">
+                ${bottomButtons}
+            </div>
+        </div>
+    `
 }

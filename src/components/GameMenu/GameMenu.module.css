@@ -1,9 +1,8 @@
 :root {
-    --color-bg-default: #f0f0f0;
-    --color-text-default: #333;
-    --color-bg-accent: #4caf50;
-    --color-text-accent: #fff;
-    --color-border-default: #333;
+    --bg-default: #f0f0f0;
+    --text-default: #333;
+    --bg-accent: #4caf50;
+    --text-accent: #fff;
 }
 
 .menu {
@@ -15,7 +14,7 @@
 
 .title {
     font-size: 24px;
-    color: var(--color-text-default);
+    color: var(--text-default);
     margin-bottom: 30px;
 }
 
@@ -34,9 +33,9 @@
     font-size: 16px;
     cursor: pointer;
     border-radius: 8px;
-    border: 1px solid var(--color-border-default);
-    background-color: var(--color-bg-default);
-    color: var(--color-text-default);
+    border: 1px solid #333;
+    background-color: var(--bg-default);
+    color: var(--text-default);
     transition:
         background 0.3s,
         color 0.3s;
@@ -44,7 +43,7 @@
 
 @media (hover: hover) {
     .button:hover {
-        background-color: var(--color-bg-default);
-        color: var(--color-text-default);
+        background-color: var(--bg-accent);
+        color: var(--text-accent);
     }
 }

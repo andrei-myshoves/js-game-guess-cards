@@ -1,43 +1,44 @@
 import { GameMenu, menuItems } from './components/GameMenu/GameMenu.js'
-import { PageBlock } from '../src/components/PageBlock/PageBlock.js'
+import { PageBlock } from './components/PageBlock/PageBlock.js'
 
-function renderPage(page) {
-    const root = document.getElementById('root')
+const root = document.getElementById('root')
 
+export function setPage(page) {
     switch (page) {
         case 'main':
-            root.innerHTML = GameMenu()
-            menuItems.forEach(item => {
-                const btn = document.getElementById(item.id)
-                if (btn) btn.addEventListener('click', () => window.setPage(item.id))
-            })
+            renderMainMenu()
             break
 
-        case 'historyPage': {
-            root.innerHTML = PageBlock('Здесь скоро будет история')
-            const backBtn = document.getElementById('backBtn')
-            if (backBtn) backBtn.onclick = () => window.setPage('main')
+        case 'historyPage':
+            renderPageWithBack('Здесь скоро будет история')
             break
-        }
 
-        case 'gamePage': {
-            root.innerHTML = PageBlock('Игра пока в разработке')
-            const backBtn = document.getElementById('backBtn')
-            if (backBtn) backBtn.onclick = () => window.setPage('main')
+        case 'gamePage':
+            renderPageWithBack('Игра пока в разработке')
             break
-        }
 
-        case 'settingsPage': {
-            root.innerHTML = PageBlock('Инструкция')
-            const backBtn = document.getElementById('backBtn')
-            if (backBtn) backBtn.onclick = () => window.setPage('main')
+        case 'settingsPage':
+            renderPageWithBack('Инструкция')
             break
-        }
     }
 
     localStorage.setItem('currentPage', page)
 }
 
-window.setPage = renderPage
+function renderMainMenu() {
+    root.innerHTML = GameMenu()
+
+    menuItems.forEach(item => {
+        const btn = document.getElementById(item.id)
+        if (btn) btn.addEventListener('click', () => setPage(item.id))
+    })
+}
+
+function renderPageWithBack(title) {
+    root.innerHTML = PageBlock(title)
+    const backBtn = document.getElementById('backBtn')
+    if (backBtn) backBtn.onclick = () => setPage('main')
+}
+
 const savedPage = localStorage.getItem('currentPage') || 'main'
-renderPage(savedPage)
+setPage(savedPage)

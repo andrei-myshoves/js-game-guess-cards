@@ -1,8 +1,9 @@
 :root {
-    --bg-default: #f0f0f0;
-    --text-default: #333;
-    --bg-accent: #4caf50;
-    --text-accent: #fff;
+    --background-default: #f0f0f0;
+    --button-default: #333;
+    --background-accent: #4caf50;
+    --button-accent: #fff;
+    --title-default: #333;
 }
 
 .page {
@@ -20,23 +21,4 @@
 
 .content {
     padding: 16px;
-}
-
-.button {
-    display: block;
-    margin: 10px 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 8px;
-    border: 1px solid #333;
-    background-color: var(--bg-default);
-    transition: background 0.3s;
-}
-
-@media (hover: hover) {
-    .button:hover {
-        background-color: var(--bg-accent);
-        color: var(--text-accent);
-    }
 }

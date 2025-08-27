@@ -1,0 +1,26 @@
+:root {
+    --background-default: #f0f0f0;
+    --button-default: #333;
+    --background-accent: #4caf50;
+    --button-accent: #fff;
+    --title-default: #333;
+}
+
+.button {
+    padding: 15px 25px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--button-default);
+    background-color: var(--background-default);
+    color: var(--button-default);
+    transition:
+        background 0.3s,
+        color 0.3s;
+}
+
+@media (hover: hover) {
+    .button:hover {
+        background-color: var(--background-accent);
+        color: var(--button-accent);
+    }
+}

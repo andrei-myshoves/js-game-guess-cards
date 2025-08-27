@@ -1,5 +1,5 @@
 import * as styles from './GameMenu.module.css'
-console.log(styles)
+import { Button } from '../Button/Button'
 
 export const menuItems = [
     { id: 'gamePage', text: 'Начать игру' },
@@ -8,14 +8,12 @@ export const menuItems = [
 ]
 
 export function GameMenu() {
-    const Buttons = menuItems
-        .map(item => `<button id="${item.id}" class="${styles.button}">${item.text}</button>`)
-        .join('')
+    const Buttons = menuItems.map(item => Button(item)).join('')
 
     return `
         <div class="${styles.menu}">
             <h1 class="${styles.title}">Главное меню</h1>
-            <div class="${styles.Buttons}">
+            <div class="${styles.buttons}">
                 ${Buttons}
             </div>
         </div>

@@ -30,14 +30,22 @@ function renderMainMenu() {
 
     menuItems.forEach(item => {
         const btn = document.getElementById(item.id)
-        if (btn) btn.addEventListener('click', () => setPage(item.id))
+        if (btn) {
+            btn.addEventListener('click', () => {
+                setPage(item.id)
+            })
+        }
     })
 }
 
 function renderPageWithBack(title) {
     root.innerHTML = PageBlock(title)
     const backBtn = document.getElementById('backBtn')
-    if (backBtn) backBtn.onclick = () => setPage('main')
+    if (backBtn) {
+        backBtn.onclick = () => {
+            setPage('main')
+        }
+    }
 }
 
 const savedPage = localStorage.getItem('currentPage') || 'main'

@@ -1,5 +1,5 @@
 import { GameMenu, menuItems } from './components/GameMenu/GameMenu.js'
-import { PageBlock } from './components/PageBlock/PageBlock.js'
+import { Layout } from './components/Layout/Layout.js'
 
 const root = document.getElementById('root')
 
@@ -39,7 +39,9 @@ function renderMainMenu() {
 }
 
 function renderPageWithBack(title) {
-    root.innerHTML = PageBlock(title)
+    root.innerHTML = ''
+    root.appendChild(Layout({ title, children: `<button id="backBtn">Назад</button>` }))
+
     const backBtn = document.getElementById('backBtn')
     if (backBtn) {
         backBtn.onclick = () => {

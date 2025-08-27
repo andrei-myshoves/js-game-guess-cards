@@ -1,4 +1,4 @@
-import * as styles from './PageBlock.module.css'
+import * as styles from './lay.module.css'
 import { Button } from '../Button/Button'
 
 export function PageBlock(title) {

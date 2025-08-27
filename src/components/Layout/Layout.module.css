@@ -6,17 +6,10 @@
     --title-default: #333;
 }
 
-.page {
-    display: block;
-    text-align: center;
-    margin-top: 50px;
-}
-
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
+.layout {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    min-height: 100vh;
 }
 
 .content {

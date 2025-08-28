@@ -1,5 +1,7 @@
 import { GameMenu, menuItems } from './components/GameMenu/GameMenu.js'
 import { Layout } from './components/Layout/Layout.js'
+import { Button } from './components/Button/Button.js'
+import './style.css'
 
 const root = document.getElementById('root')
 
@@ -39,14 +41,19 @@ function renderMainMenu() {
 }
 
 function renderPageWithBack(title) {
+    const backBtnHTML = Button({ id: 'backBtn', text: 'Назад' })
+
     root.innerHTML = ''
-    root.appendChild(Layout({ title, children: `<button id="backBtn">Назад</button>` }))
+    root.appendChild(
+        Layout({
+            title,
+            children: backBtnHTML,
+        })
+    )
 
     const backBtn = document.getElementById('backBtn')
     if (backBtn) {
-        backBtn.onclick = () => {
-            setPage('main')
-        }
+        backBtn.onclick = () => setPage('main')
     }
 }
 

@@ -1,11 +1,3 @@
-:root {
-    --background-default: #f0f0f0;
-    --button-default: #333;
-    --background-accent: #4caf50;
-    --button-accent: #fff;
-    --title-default: #333;
-}
-
 .menu {
     display: grid;
     justify-items: center;
@@ -15,7 +7,7 @@
 
 .title {
     font-size: 24px;
-    color: var(--title-default);
+    color: var(--foreground-default);
 }
 
 .buttons {

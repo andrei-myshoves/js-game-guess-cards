@@ -13,7 +13,7 @@ export default defineConfig([
         extends: ['js/recommended'],
         rules: {
             'prettier/prettier': 'error',
-            'arrow-parens': ['error', 'as-needed'], 
+            'arrow-parens': ['error', 'as-needed'],
             'arrow-body-style': ['error', 'as-needed'],
         },
         languageOptions: {
@@ -45,5 +45,13 @@ export default defineConfig([
         language: 'markdown/gfm',
         extends: ['markdown/recommended'],
     },
-    { files: ['**/*.css'], plugins: { css }, language: 'css/css', extends: ['css/recommended'] },
+    {
+        files: ['**/*.css'],
+        plugins: { css },
+        language: 'css/css',
+        extends: ['css/recommended'],
+        rules: {
+            'css/no-invalid-properties': 'off',
+        },
+    },
 ])

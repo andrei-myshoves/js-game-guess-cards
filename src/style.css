@@ -1,8 +1,7 @@
-body {
-    background-color: lightblue;
-}
+:root {
+    --background-default: #f0f0f0;
+    --foreground-default: #333;
 
-h1 {
-    color: darkblue;
-    text-align: center;
+    --background-accent-hover: #4caf50;
+    --foreground-accent-hover: #fff;
 }

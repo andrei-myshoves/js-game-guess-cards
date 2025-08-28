@@ -9,7 +9,7 @@ export function Layout({ title, children }) {
     container.appendChild(header)
 
     const main = document.createElement('main')
-    main.className = styles.content
+    main.className = styles.container
 
     if (typeof children === 'string') {
         main.innerHTML = children

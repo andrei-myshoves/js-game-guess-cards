@@ -1,9 +1,10 @@
 .layout {
     display: grid;
     grid-template-rows: auto 1fr;
-    min-height: 100vh;
+    min-height: 100svh;
 }
 
-.content {
-    padding: 16px;
+.container {
+    padding: 0 16px;
+    width: 100%;
 }

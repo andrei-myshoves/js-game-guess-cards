@@ -1,24 +1,61 @@
+import { GameMenu, menuItems } from './components/GameMenu/GameMenu.js'
+import { Layout } from './components/Layout/Layout.js'
+import { Button } from './components/Button/Button.js'
 import './style.css'
-import bird from '../src/img/Picture-bird.webp'
-import iconSVG from '../src/img/Bag.svg'
-
-import * as styles from './index.module.css'
-
-console.log('CSS Module rrr:', styles.rrr)
 
 const root = document.getElementById('root')
-const app = document.createElement('h1')
-app.textContent = 'Hello World!'
-app.className = styles.rrr
 
-root.appendChild(app)
+export function setPage(page) {
+    switch (page) {
+        case 'main':
+            renderMainMenu()
+            break
 
-const img = document.createElement('img')
-img.src = bird
-img.alt = 'Bird'
-img.width = 200
-root.appendChild(img)
+        case 'historyPage':
+            renderPageWithBack('Здесь скоро будет история')
+            break
 
-const svgContainer = document.createElement('div')
-svgContainer.innerHTML = iconSVG
-root.appendChild(svgContainer)
+        case 'gamePage':
+            renderPageWithBack('Игра пока в разработке')
+            break
+
+        case 'settingsPage':
+            renderPageWithBack('Инструкция')
+            break
+    }
+
+    localStorage.setItem('currentPage', page)
+}
+
+function renderMainMenu() {
+    root.innerHTML = GameMenu()
+
+    menuItems.forEach(item => {
+        const btn = document.getElementById(item.id)
+        if (btn) {
+            btn.addEventListener('click', () => {
+                setPage(item.id)
+            })
+        }
+    })
+}
+
+function renderPageWithBack(title) {
+    const backBtnHTML = Button({ id: 'backBtn', text: 'Назад' })
+
+    root.innerHTML = ''
+    root.appendChild(
+        Layout({
+            title,
+            children: backBtnHTML,
+        })
+    )
+
+    const backBtn = document.getElementById('backBtn')
+    if (backBtn) {
+        backBtn.onclick = () => setPage('main')
+    }
+}
+
+const savedPage = localStorage.getItem('currentPage') || 'main'
+setPage(savedPage)

@@ -1,4 +1,5 @@
 import { GameMenu, menuItems } from './components/GameMenu/GameMenu.js'
+import { GameSettingsMenu } from './components/GameMenuSettings/GameMenuSettings.js'
 import { Layout } from './components/Layout/Layout.js'
 import { Button } from './components/Button/Button.js'
 import './style.css'
@@ -15,9 +16,22 @@ export function setPage(page) {
             renderPageWithBack('Здесь скоро будет история')
             break
 
-        case 'gamePage':
-            renderPageWithBack('Игра пока в разработке')
+        case 'gamePage': {
+            const backBtnHTML = Button({ id: 'backBtn', text: 'Назад' })
+
+            root.innerHTML = ''
+            root.appendChild(
+                Layout({
+                    children: GameSettingsMenu() + backBtnHTML,
+                })
+            )
+
+            const backBtn = document.getElementById('backBtn')
+            if (backBtn) {
+                backBtn.onclick = () => setPage('main')
+            }
             break
+        }
 
         case 'settingsPage':
             renderPageWithBack('Инструкция')

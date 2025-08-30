@@ -1,0 +1,45 @@
+.menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: 20px;
+}
+
+.buttonEasy {
+    background: var(--easy-accent);
+}
+
+.buttonMedium {
+    background: var(--medium-accent);
+}
+
+.buttonHard {
+    background: var(--hard-accent);
+}
+
+@media (hover: hover) {
+    .buttonEasy:hover {
+        background-color: var(--dificult-setting-accent-hover);
+        color: var(--foreground-accent-hover);
+    }
+    .buttonMedium:hover {
+        background-color: var(--dificult-setting-accent-hover);
+        color: var(--foreground-accent-hover);
+    }
+    .buttonHard:hover {
+        background-color: var(--dificult-setting-accent-hover);
+        color: var(--foreground-accent-hover);
+    }
+}

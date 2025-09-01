@@ -18,15 +18,15 @@
 }
 
 .buttonEasy {
-    background: var(--easy-accent);
+    background: #4caf50;
 }
 
 .buttonMedium {
-    background: var(--medium-accent);
+    background: #ff9800;
 }
 
 .buttonHard {
-    background: var(--hard-accent);
+    background: #f44336;
 }
 
 @media (hover: hover) {

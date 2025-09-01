@@ -28,7 +28,7 @@ export function setPage(page) {
 
             const backBtn = document.getElementById('backBtn')
             if (backBtn) {
-                backBtn.onclick = () => setPage('main')
+                backBtn.addEventListener('click', () => setPage('main'))
             }
             break
         }

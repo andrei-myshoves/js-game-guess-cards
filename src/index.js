@@ -14,15 +14,15 @@ export function setPage(page) {
             break
 
         case 'historyPage':
-            renderPageWithBack('Здесь скоро будет история')
+            renderPageWithBack('Здесь скоро будет история', '')
             break
 
         case 'gamePage':
-            renderPageWithBack(GameSettingsMenu())
+            renderPageWithBack('Выберите сложность', GameSettingsMenu())
             break
 
         case 'settingsPage':
-            renderPageWithBack('Инструкция')
+            renderPageWithBack('Инструкция', 'Текст инструкции...')
             break
     }
 
@@ -41,8 +41,8 @@ function renderMainMenu() {
     })
 }
 
-function renderPageWithBack(content) {
-    const layout = Layout({ title: '', children: content, showBack: true })
+function renderPageWithBack(title, content) {
+    const layout = Layout({ title, children: content, showBack: true })
     root.appendChild(layout)
 
     const backBtn = document.getElementById('backBtn')

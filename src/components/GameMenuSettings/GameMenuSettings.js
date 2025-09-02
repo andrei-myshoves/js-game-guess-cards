@@ -11,11 +11,6 @@ export function GameSettingsMenu() {
     const container = document.createElement('div')
     container.className = styles.menu
 
-    const title = document.createElement('h1')
-    title.className = styles.title
-    title.textContent = 'Выберите сложность'
-    container.appendChild(title)
-
     const buttonsWrapper = document.createElement('div')
     buttonsWrapper.className = styles.buttons
 

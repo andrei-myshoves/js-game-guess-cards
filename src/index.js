@@ -1,12 +1,13 @@
 import { GameMenu, menuItems } from './components/GameMenu/GameMenu.js'
 import { GameSettingsMenu } from './components/GameMenuSettings/GameMenuSettings.js'
 import { Layout } from './components/Layout/Layout.js'
-import { Button } from './components/Button/Button.js'
 import './style.css'
 
 const root = document.getElementById('root')
 
 export function setPage(page) {
+    root.innerHTML = ''
+
     switch (page) {
         case 'main':
             renderMainMenu()
@@ -16,22 +17,9 @@ export function setPage(page) {
             renderPageWithBack('Здесь скоро будет история')
             break
 
-        case 'gamePage': {
-            const backBtnHTML = Button({ id: 'backBtn', text: 'Назад' })
-
-            root.innerHTML = ''
-            root.appendChild(
-                Layout({
-                    children: GameSettingsMenu() + backBtnHTML,
-                })
-            )
-
-            const backBtn = document.getElementById('backBtn')
-            if (backBtn) {
-                backBtn.addEventListener('click', () => setPage('main'))
-            }
+        case 'gamePage':
+            renderPageWithBack(GameSettingsMenu())
             break
-        }
 
         case 'settingsPage':
             renderPageWithBack('Инструкция')
@@ -42,32 +30,24 @@ export function setPage(page) {
 }
 
 function renderMainMenu() {
-    root.innerHTML = GameMenu()
+    const menu = GameMenu()
+    root.appendChild(menu)
 
     menuItems.forEach(item => {
         const btn = document.getElementById(item.id)
         if (btn) {
-            btn.addEventListener('click', () => {
-                setPage(item.id)
-            })
+            btn.addEventListener('click', () => setPage(item.id))
         }
     })
 }
 
-function renderPageWithBack(title) {
-    const backBtnHTML = Button({ id: 'backBtn', text: 'Назад' })
-
-    root.innerHTML = ''
-    root.appendChild(
-        Layout({
-            title,
-            children: backBtnHTML,
-        })
-    )
+function renderPageWithBack(content) {
+    const layout = Layout({ title: '', children: content, showBack: true })
+    root.appendChild(layout)
 
     const backBtn = document.getElementById('backBtn')
     if (backBtn) {
-        backBtn.onclick = () => setPage('main')
+        backBtn.addEventListener('click', () => setPage('main'))
     }
 }
 

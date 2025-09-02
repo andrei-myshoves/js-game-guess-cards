@@ -6,3 +6,32 @@
     margin-top: 50px;
     gap: 10px;
 }
+
+.left {
+    flex: 0 0 auto;
+}
+
+.right {
+    flex: 0 0 auto;
+}
+
+.title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.buttonBack {
+    background-color: var(--background-accent, #eee);
+    font-size: 14px;
+    padding: 6px 12px;
+    opacity: 0.9;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+}

@@ -1,6 +1,9 @@
 import * as styles from './Button.module.css'
 
 export function Button({ id, text, extraClass = '' }) {
-    const classNames = [styles.button, extraClass].filter(Boolean).join(' ')
-    return `<button id="${id}" class="${classNames}">${text}</button>`
+    const btn = document.createElement('button')
+    btn.id = id
+    btn.className = `${styles.button} ${extraClass}`.trim()
+    btn.textContent = text
+    return btn
 }

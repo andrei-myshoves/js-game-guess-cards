@@ -1,5 +1,6 @@
 import * as styles from './GameMenuSettings.module.css'
 import { Button } from '../Button/Button.js'
+import { htmlToElement } from '../../utils/htmlToELement.js'
 
 export const difficultyLevels = [
     { id: 'easy', text: 'Лёгкая', extraClass: styles.buttonEasy },
@@ -8,17 +9,13 @@ export const difficultyLevels = [
 ]
 
 export function GameSettingsMenu() {
-    const container = document.createElement('div')
-    container.className = styles.menu
+    const buttonsHTML = difficultyLevels.map(level => Button(level).outerHTML).join('')
 
-    const buttonsWrapper = document.createElement('div')
-    buttonsWrapper.className = styles.buttons
-
-    difficultyLevels.forEach(level => {
-        const btn = Button({ id: level.id, text: level.text, extraClass: level.extraClass })
-        buttonsWrapper.appendChild(btn)
-    })
-
-    container.appendChild(buttonsWrapper)
-    return container
+    return htmlToElement(`
+    <div class="${styles.menu}">
+      <div class="${styles.buttons}">
+        ${buttonsHTML}
+      </div>
+    </div>
+  `)
 }

@@ -1,5 +1,6 @@
 import * as styles from './GameMenu.module.css'
 import { Button } from '../Button/Button.js'
+import { htmlToElement } from '../../utils/htmlToELement.js'
 
 export const menuItems = [
     { id: 'gamePage', text: 'Начать игру', extraClass: styles.buttonStart },
@@ -8,22 +9,14 @@ export const menuItems = [
 ]
 
 export function GameMenu() {
-    const container = document.createElement('div')
-    container.className = styles.menu
+    const buttonsHTML = menuItems.map(item => Button(item).outerHTML).join('')
 
-    const title = document.createElement('h1')
-    title.className = styles.title
-    title.textContent = 'Главное меню'
-    container.appendChild(title)
-
-    const buttonsWrapper = document.createElement('div')
-    buttonsWrapper.className = styles.buttons
-
-    menuItems.forEach(item => {
-        const btn = Button({ id: item.id, text: item.text, extraClass: item.extraClass })
-        buttonsWrapper.appendChild(btn)
-    })
-
-    container.appendChild(buttonsWrapper)
-    return container
+    return htmlToElement(`
+    <div class="${styles.menu}">
+      <h1 class="${styles.title}">Главное меню</h1>
+      <div class="${styles.buttons}">
+        ${buttonsHTML}
+      </div>
+    </div>
+  `)
 }

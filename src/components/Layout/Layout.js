@@ -1,20 +1,13 @@
 import { Header } from '../Header/Header.js'
+import { htmlToElement } from '../../utils/htmlToELement.js'
 
-export function Layout({ title = '', children, showBack = false }) {
-    const layout = document.createElement('div')
-    layout.className = 'layout'
-
-    layout.appendChild(Header(title, showBack))
-
-    const content = document.createElement('div')
-    content.className = 'content'
-
-    if (children instanceof HTMLElement) {
-        content.appendChild(children)
-    } else {
-        content.textContent = children
-    }
-
-    layout.appendChild(content)
-    return layout
+export function Layout({ title = '', children = '', showBack = false }) {
+    return htmlToElement(`
+    <div class="layout">
+      ${Header(title, showBack).outerHTML}
+      <div class="content">
+        ${children instanceof HTMLElement ? children.outerHTML : children}
+      </div>
+    </div>
+  `)
 }

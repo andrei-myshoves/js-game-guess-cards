@@ -1,6 +1,10 @@
 import * as styles from './Button.module.css'
+import { htmlToElement } from '../../utils/htmlToELement'
 
 export function Button({ id, text, extraClass = '' }) {
-    const classNames = [styles.button, extraClass].filter(Boolean).join(' ')
-    return `<button id="${id}" class="${classNames}">${text}</button>`
+    return htmlToElement(`
+    <button id="${id}" class="${styles.button} ${extraClass}">
+      ${text}
+    </button>
+  `)
 }

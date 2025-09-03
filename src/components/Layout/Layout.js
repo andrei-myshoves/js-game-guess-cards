@@ -1,22 +1,13 @@
-import * as styles from './Layout.module.css'
-import { Header } from '../Header/Header'
+import { Header } from '../Header/Header.js'
+import { htmlToElement } from '../../utils/htmlToELement.js'
 
-export function Layout({ title, children }) {
-    const container = document.createElement('div')
-    container.className = styles.layout
-
-    const header = Header(title)
-    container.appendChild(header)
-
-    const main = document.createElement('main')
-    main.className = styles.container
-
-    if (typeof children === 'string') {
-        main.innerHTML = children
-    } else if (children instanceof HTMLElement) {
-        main.appendChild(children)
-    }
-
-    container.appendChild(main)
-    return container
+export function Layout({ title = '', children = '', showBack = false }) {
+    return htmlToElement(`
+    <div class="layout">
+      ${Header(title, showBack).outerHTML}
+      <div class="content">
+        ${children instanceof HTMLElement ? children.outerHTML : children}
+      </div>
+    </div>
+  `)
 }

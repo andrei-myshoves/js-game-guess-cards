@@ -2,7 +2,7 @@ import { GameMenu, menuItems } from './components/GameMenu/GameMenu.js'
 import { GameSettingsMenu } from './components/GameMenuSettings/GameMenuSettings.js'
 import { Layout } from './components/Layout/Layout.js'
 import { GamePage } from './components/GamePage/GamePage.js'
-import { startTimer, updateTimer, stopTimer, resumeTimer } from './components/Timer/Timer.js'
+import { startTimer, updateTimer, stopTimer, pauseTimer, resumeTimer } from './components/Timer/Timer.js'
 import './style.css'
 
 const root = document.getElementById('root')
@@ -80,6 +80,11 @@ function renderPageWithBack(title, content, isSettingsMenu = false) {
     }
 }
 
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pauseTimer()
+    else resumeTimer()
+})
+
 function renderGamePage() {
     const layout = Layout({ title: 'Игра', children: GamePage(), showBack: true })
     root.appendChild(layout)
@@ -93,7 +98,6 @@ function renderGamePage() {
     }
 
     if (localStorage.getItem('endTime')) {
-        stopTimer()
         updateTimer()
         resumeTimer()
     }

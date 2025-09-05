@@ -1,38 +1,60 @@
 let timerInterval
+let remainingTime = 0
+let isPaused = false
 
 export function startTimer(seconds) {
-    const endTime = Date.now() + seconds * 1000
-    localStorage.setItem('endTime', endTime)
+    remainingTime = seconds
+    localStorage.setItem('remainingTime', remainingTime)
+    isPaused = false
 
     updateTimer()
-    timerInterval = setInterval(updateTimer, 1000)
+    clearInterval(timerInterval)
+    timerInterval = setInterval(tick, 1000)
+}
+
+function tick() {
+    if (isPaused) return
+
+    remainingTime = parseInt(localStorage.getItem('remainingTime')) || 0
+
+    if (remainingTime > 0) {
+        remainingTime--
+        localStorage.setItem('remainingTime', remainingTime)
+    }
+
+    updateTimer()
+
+    if (remainingTime <= 0) {
+        clearInterval(timerInterval)
+        alert('Время вышло!')
+        localStorage.removeItem('remainingTime')
+    }
 }
 
 export function updateTimer() {
-    const endTime = localStorage.getItem('endTime')
-    if (!endTime) return
-
-    const remaining = Math.max(0, Math.floor((endTime - Date.now()) / 1000))
-
-    const minutes = String(Math.floor(remaining / 60)).padStart(2, '0')
-    const secs = String(remaining % 60).padStart(2, '0')
+    const minutes = String(Math.floor(remainingTime / 60)).padStart(2, '0')
+    const secs = String(remainingTime % 60).padStart(2, '0')
 
     const timerEl = document.getElementById('timer')
     if (timerEl) timerEl.textContent = `${minutes}:${secs}`
-
-    if (remaining <= 0) {
-        clearInterval(timerInterval)
-        alert('Время вышло!')
-        localStorage.removeItem('endTime')
-    }
 }
 
 export function stopTimer() {
     clearInterval(timerInterval)
-    localStorage.removeItem('endTime')
+    localStorage.removeItem('remainingTime')
+    remainingTime = 0
+    updateTimer()
+}
+
+export function pauseTimer() {
+    isPaused = true
+    clearInterval(timerInterval)
 }
 
 export function resumeTimer() {
-    clearInterval(timerInterval)
-    timerInterval = setInterval(updateTimer, 1000)
+    if (remainingTime > 0) {
+        isPaused = false
+        clearInterval(timerInterval)
+        timerInterval = setInterval(tick, 1000)
+    }
 }

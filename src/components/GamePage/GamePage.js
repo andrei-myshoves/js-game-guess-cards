@@ -1,21 +1,22 @@
 import { Button } from '../Button/Button.js'
 import { Card } from '../Card/Card.js'
 import { htmlToElement } from '../../utils/htmlToELement.js'
+import * as styles from './GamePage.module.css'
 
 export function GamePage() {
     const container = htmlToElement(`
-        <div>
-            <div id="timer">00:00</div>
-            <div id="cards-container" class="cards-grid"></div>
-        </div>
-    `)
+    <div>
+      <div id="timer">00:00</div>
+      <div id="cards-container" class="${styles.cardsGrid}"></div>
+    </div>
+  `)
 
-    const cardsContainer = container.querySelector('#cards-container')
+    const cardsContainer = container.querySelector(`#cards-container`)
 
     const endBtn = Button({
         id: 'endGameBtn',
         text: 'Завершить игру',
-        onClick: () => {},
+        extraClass: '',
     })
     container.appendChild(endBtn)
 

@@ -93,11 +93,3 @@ h6 {
 
     --dificult-setting-accent-hover: #f9f9f9;
 }
-
-.cards-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 80px);
-    gap: 10px;
-    justify-content: center;
-    margin-top: 20px;
-}

@@ -13,7 +13,7 @@
     transform-style: preserve-3d;
 }
 
-.flipped {
+.cardInner.flipped {
     transform: rotateY(180deg);
 }
 
@@ -28,9 +28,20 @@
 
 .cardFront {
     background: gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .cardBack {
     transform: rotateY(180deg);
     background: white;
+}
+
+.cardBack img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    border-radius: 8px;
 }

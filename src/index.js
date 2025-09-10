@@ -6,7 +6,12 @@ import { startTimer, updateTimer, stopTimer, pauseTimer, resumeTimer } from './c
 import './style.css'
 
 const root = document.getElementById('root')
-console.log(123,root)
+
+const levelTimes = {
+    easy: 180,
+    medium: 120,
+    hard: 60,
+}
 
 export function setPage(page) {
     root.innerHTML = ''
@@ -17,14 +22,16 @@ export function setPage(page) {
             break
 
         case 'historyPage':
-            renderPageWithBack('Здесь скоро будет история', '')
+            renderPageWithBack('Здесь скоро будет история', '', false, 'main')
             break
 
-        case 'gamePage': {
+        case 'gamePage':
+        case 'game-page-with-cards': {
             const level = localStorage.getItem('selectedLevel')
+
             if (level) {
-                renderGamePage()
-                startTimer(parseInt(level))
+                renderGamePage(level)
+                startTimer(levelTimes[level])
                 localStorage.removeItem('selectedLevel')
             } else {
                 renderPageWithBack('Выберите сложность', GameSettingsMenu(), true, 'main')
@@ -33,7 +40,12 @@ export function setPage(page) {
         }
 
         case 'settingsPage':
-            renderPageWithBack('Инструкция', 'Текст инструкции...')
+            renderPageWithBack('Инструкция', 'Текст инструкции...', false, 'main')
+            break
+
+        default:
+            console.warn(`Неизвестная страница: ${page}, возвращаемся в главное меню`)
+            setPage('main')
             break
     }
 
@@ -67,27 +79,22 @@ function renderPageWithBack(title, content, isSettingsMenu = false, backTarget =
         const hardBtn = document.getElementById('hard')
 
         easyBtn.addEventListener('click', () => {
-            localStorage.setItem('selectedLevel', '180')
+            localStorage.setItem('selectedLevel', 'easy')
             setPage('gamePage')
         })
         mediumBtn.addEventListener('click', () => {
-            localStorage.setItem('selectedLevel', '120')
+            localStorage.setItem('selectedLevel', 'medium')
             setPage('gamePage')
         })
         hardBtn.addEventListener('click', () => {
-            localStorage.setItem('selectedLevel', '60')
+            localStorage.setItem('selectedLevel', 'hard')
             setPage('gamePage')
         })
     }
 }
 
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) pauseTimer()
-    else resumeTimer()
-})
-
-function renderGamePage() {
-    const layout = Layout({ title: 'Игра', children: GamePage(), showBack: true })
+function renderGamePage(selectedLevel) {
+    const layout = Layout({ title: 'Игра', children: GamePage(selectedLevel), showBack: true })
     root.appendChild(layout)
 
     const endBtn = document.getElementById('endGameBtn')
@@ -111,6 +118,11 @@ function renderGamePage() {
         resumeTimer()
     }
 }
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pauseTimer()
+    else resumeTimer()
+})
 
 const savedPage = localStorage.getItem('currentPage') || 'main'
 setPage(savedPage)

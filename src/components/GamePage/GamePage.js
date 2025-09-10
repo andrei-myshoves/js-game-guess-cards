@@ -3,7 +3,23 @@ import { Card } from '../Card/Card.js'
 import { htmlToElement } from '../../utils/htmlToELement.js'
 import * as styles from './GamePage.module.css'
 
-export function GamePage() {
+const images = [
+    '/img/Air.png',
+    '/img/Darkness.png',
+    '/img/Earth.png',
+    '/img/Fire.png',
+    '/img/Light.png',
+    '/img/Tree.png',
+    '/img/Water.png',
+]
+
+const levels = {
+    easy: 6,
+    medium: 10,
+    hard: 16,
+}
+
+export function GamePage(selectedLevel = 'easy') {
     const container = htmlToElement(`
     <div>
       <div id="timer">00:00</div>
@@ -11,7 +27,7 @@ export function GamePage() {
     </div>
   `)
 
-    const cardsContainer = container.querySelector(`#cards-container`)
+    const cardsContainer = container.querySelector('#cards-container')
 
     const endBtn = Button({
         id: 'endGameBtn',
@@ -20,16 +36,9 @@ export function GamePage() {
     })
     container.appendChild(endBtn)
 
-    const images = [
-        '/img/Air.png',
-        '/img/Darkness.png',
-        '/img/Earth.png',
-        '/img/Fire.png',
-        '/img/Light.png',
-        '/img/Tree.png',
-        '/img/Water.png',
-    ]
-    const cardsData = [...images, ...images].sort(() => Math.random() - 0.5)
+    const cardCount = levels[selectedLevel]
+    const selectedImages = [...images].slice(0, Math.ceil(cardCount / 2))
+    const cardsData = [...selectedImages, ...selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)
 
     let flippedCards = []
     let matchedCount = 0
@@ -40,7 +49,10 @@ export function GamePage() {
     })
 
     function handleCardClick(id, image, cardEl) {
+        if (flippedCards.find(c => c.id === id)) return
+
         flippedCards.push({ id, image, cardEl })
+        cardEl.classList.add('selected')
 
         if (flippedCards.length === 2) {
             const [first, second] = flippedCards
@@ -48,13 +60,13 @@ export function GamePage() {
                 matchedCount++
                 flippedCards = []
 
-                if (matchedCount === images.length) {
-                    setTimeout(() => alert('Ты победил!'), 300)
+                if (matchedCount === selectedImages.length) {
+                    setTimeout(() => alert('Ты победил! 🎉'), 300)
                 }
             } else {
                 setTimeout(() => {
-                    first.cardEl.classList.remove('flipped')
-                    second.cardEl.classList.remove('flipped')
+                    first.cardEl.classList.remove('selected')
+                    second.cardEl.classList.remove('selected')
                     flippedCards = []
                 }, 1000)
             }

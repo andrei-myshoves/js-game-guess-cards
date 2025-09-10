@@ -6,6 +6,7 @@ import { startTimer, updateTimer, stopTimer, pauseTimer, resumeTimer } from './c
 import './style.css'
 
 const root = document.getElementById('root')
+console.log(123,root)
 
 export function setPage(page) {
     root.innerHTML = ''

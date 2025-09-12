@@ -1,48 +1,50 @@
 {
-  "name": "js-game-guess-cards",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "build:dev": "webpack --env mode=development",
-    "build:prod": "webpack --env mode=production",
-    "start": "webpack serve --env mode=development",
-    "format": "prettier --write \"src/**/*.{js,css,html,json,md}\"",
-    "lint": "eslint \"src/**/*.{js,mjs,cjs}\"",
-    "lint:fix": "eslint \"src/**/*.{js,mjs,cjs}\" --fix"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "devDependencies": {
-    "@eslint/css": "^0.10.0",
-    "@eslint/js": "^9.33.0",
-    "@eslint/json": "^0.13.1",
-    "@eslint/markdown": "^7.2.0",
-    "css-loader": "^7.1.2",
-    "css-minimizer-webpack-plugin": "^7.0.2",
-    "eslint": "^9.33.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.4",
-    "globals": "^16.3.0",
-    "html-webpack-plugin": "^5.5.3",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.1.5",
-    "mini-css-extract-plugin": "^2.9.4",
-    "prettier": "^3.6.2",
-    "style-loader": "^4.0.0",
-    "webpack": "^5.101.3",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1"
-  },
-  "lint-staged": {
-    "*.{js,css,md}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "package.json": [
-      "eslint --fix",
-      "prettier --write"
-    ]
-  }
+    "name": "js-game-guess-cards",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "build:dev": "webpack --env mode=development",
+        "build:prod": "webpack --env mode=production",
+        "start": "webpack serve --env mode=development",
+        "format": "prettier --write \"src/**/*.{js,css,html,json,md}\"",
+        "lint": "eslint \"src/**/*.{js,mjs,cjs}\"",
+        "lint:fix": "eslint \"src/**/*.{js,mjs,cjs}\" --fix"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "devDependencies": {
+        "@eslint/css": "^0.10.0",
+        "@eslint/js": "^9.33.0",
+        "@eslint/json": "^0.13.1",
+        "@eslint/markdown": "^7.2.0",
+        "css-loader": "^7.1.2",
+        "css-minimizer-webpack-plugin": "^7.0.2",
+        "eslint": "^9.33.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-prettier": "^5.5.4",
+        "globals": "^16.3.0",
+        "html-webpack-plugin": "^5.5.3",
+        "husky": "^9.1.7",
+        "lint-staged": "^16.1.5",
+        "mini-css-extract-plugin": "^2.9.4",
+        "prettier": "^3.6.2",
+        "style-loader": "^4.0.0",
+        "webpack": "^5.101.3",
+        "webpack-cli": "^5.1.4",
+        "webpack-dev-server": "^4.15.1"
+    },
+    "lint-staged": {
+        "*.{js,mjs,cjs}": [
+            "eslint --fix",
+            "prettier --write"
+        ],
+        "*.{css,md}": [
+            "prettier --write"
+        ],
+        "package.json": [
+            "prettier --write"
+        ]
+    }
 }

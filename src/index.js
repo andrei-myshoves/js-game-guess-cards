@@ -15,18 +15,24 @@ const levelTimes = {
 
 export function setPage(page) {
     root.innerHTML = ''
-
     switch (page) {
-        case 'main':
+        case 'mainPage': {
             renderMainMenu()
             break
+        }
 
-        case 'historyPage':
-            renderPageWithBack('Здесь скоро будет история', '', false, 'main')
+        case 'historyPage': {
+            renderPageWithBack({
+                title: 'Здесь скоро будет история',
+                nextTitle: '',
+                isSettingsMenu: false,
+                pageName: 'mainPage',
+            })
             break
+        }
 
         case 'gamePage':
-        case 'game-page-with-cards': {
+        case 'gamePageWithCards': {
             const level = localStorage.getItem('selectedLevel')
 
             if (level) {
@@ -34,21 +40,31 @@ export function setPage(page) {
                 startTimer(levelTimes[level])
                 localStorage.removeItem('selectedLevel')
             } else {
-                renderPageWithBack('Выберите сложность', GameSettingsMenu(), true, 'main')
+                renderPageWithBack({
+                    title: 'Выберите сложность',
+                    nextTitle: GameSettingsMenu(),
+                    isSettingsMenu: true,
+                    pageName: 'mainPage',
+                })
             }
             break
         }
 
-        case 'settingsPage':
-            renderPageWithBack('Инструкция', 'Текст инструкции...', false, 'main')
+        case 'settingsPage': {
+            renderPageWithBack({
+                title: 'Инструкция',
+                nextTitle: 'Текст инструкции...',
+                pageName: 'mainPage',
+            })
             break
+        }
 
-        default:
+        default: {
             console.warn(`Неизвестная страница: ${page}, возвращаемся в главное меню`)
-            setPage('main')
+            setPage('mainPage')
             break
+        }
     }
-
     localStorage.setItem('currentPage', page)
 }
 
@@ -64,13 +80,23 @@ function renderMainMenu() {
     })
 }
 
-function renderPageWithBack(title, content, isSettingsMenu = false, backTarget = 'main') {
-    const layout = Layout({ title, children: content, showBack: true })
+function renderPageWithBack({
+    title,
+    nextTitle,
+    isSettingsMenu = false,
+    pageName = 'mainPage',
+    showBackButton = true,
+}) {
+    const layout = Layout({
+        title,
+        children: nextTitle,
+        showBack: showBackButton,
+    })
     root.appendChild(layout)
 
     const backBtn = document.getElementById('backBtn')
     if (backBtn) {
-        backBtn.addEventListener('click', () => setPage(backTarget))
+        backBtn.addEventListener('click', () => setPage(pageName))
     }
 
     if (isSettingsMenu) {
@@ -78,30 +104,42 @@ function renderPageWithBack(title, content, isSettingsMenu = false, backTarget =
         const mediumBtn = document.getElementById('medium')
         const hardBtn = document.getElementById('hard')
 
-        easyBtn.addEventListener('click', () => {
-            localStorage.setItem('selectedLevel', 'easy')
-            setPage('gamePage')
-        })
-        mediumBtn.addEventListener('click', () => {
-            localStorage.setItem('selectedLevel', 'medium')
-            setPage('gamePage')
-        })
-        hardBtn.addEventListener('click', () => {
-            localStorage.setItem('selectedLevel', 'hard')
-            setPage('gamePage')
-        })
+        if (easyBtn) {
+            easyBtn.addEventListener('click', () => {
+                localStorage.setItem('selectedLevel', 'easy')
+                setPage('gamePage')
+            })
+        }
+
+        if (mediumBtn) {
+            mediumBtn.addEventListener('click', () => {
+                localStorage.setItem('selectedLevel', 'medium')
+                setPage('gamePage')
+            })
+        }
+
+        if (hardBtn) {
+            hardBtn.addEventListener('click', () => {
+                localStorage.setItem('selectedLevel', 'hard')
+                setPage('gamePage')
+            })
+        }
     }
 }
 
 function renderGamePage(selectedLevel) {
-    const layout = Layout({ title: 'Игра', children: GamePage(selectedLevel), showBack: true })
+    const layout = Layout({
+        title: 'Игра',
+        children: GamePage(selectedLevel),
+        showBack: true,
+    })
     root.appendChild(layout)
 
     const endBtn = document.getElementById('endGameBtn')
     if (endBtn) {
         endBtn.addEventListener('click', () => {
             stopTimer()
-            setPage('main')
+            setPage('mainPage')
         })
     }
 
@@ -109,7 +147,7 @@ function renderGamePage(selectedLevel) {
     if (backBtn) {
         backBtn.addEventListener('click', () => {
             stopTimer()
-            setPage('gamePage')
+            setPage('mainPage')
         })
     }
 
@@ -120,9 +158,12 @@ function renderGamePage(selectedLevel) {
 }
 
 document.addEventListener('visibilitychange', () => {
-    if (document.hidden) pauseTimer()
-    else resumeTimer()
+    if (document.hidden) {
+        pauseTimer()
+    } else {
+        resumeTimer()
+    }
 })
 
-const savedPage = localStorage.getItem('currentPage') || 'main'
+const savedPage = localStorage.getItem('currentPage') || 'mainPage'
 setPage(savedPage)

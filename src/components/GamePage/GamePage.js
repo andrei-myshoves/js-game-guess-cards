@@ -46,8 +46,9 @@ export function GamePage(selectedLevel = 'easy') {
     })
 
     function handleCardClick(id, image, cardEl, innerEl) {
-        if (flippedCards.find(c => c.cardId === id)) return
-
+        if (flippedCards.find(c => c.cardId === id)) {
+            return
+        }
         flippedCards.push({ cardId: id, image, cardEl, innerEl })
 
         if (flippedCards.length === 2) {
@@ -56,7 +57,9 @@ export function GamePage(selectedLevel = 'easy') {
             if (first.image === second.image) {
                 matchedCount++
                 flippedCards = []
-                if (matchedCount === selectedImages.length) setTimeout(() => alert('Ты победил! 🎉'), 300)
+                if (matchedCount === selectedImages.length) {
+                    setTimeout(() => alert('Ты победил! 🎉'), 300)
+                }
             } else {
                 setTimeout(() => {
                     first.innerEl.style.display = 'none'

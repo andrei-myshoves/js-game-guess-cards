@@ -5,13 +5,13 @@ import * as pageStyles from './GamePage.module.css'
 import * as cardStyles from '../Card/Card.module.css'
 
 const images = [
-    '/img/Air.png',
-    '/img/Darkness.png',
-    '/img/Earth.png',
-    '/img/Fire.png',
-    '/img/Light.png',
-    '/img/Tree.png',
-    '/img/Water.png',
+    '/img/Air.webp',
+    '/img/Darkness.webp',
+    '/img/Earth.webp',
+    '/img/Fire.webp',
+    '/img/Light.webp',
+    '/img/Tree.webp',
+    '/img/Water.webp',
 ]
 
 const levels = { easy: 6, medium: 10, hard: 16 }

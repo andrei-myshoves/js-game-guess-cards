@@ -2,7 +2,6 @@ import { Button } from '../Button/Button.js'
 import { Card } from '../Card/Card.js'
 import { htmlToElement } from '../../utils/htmlToELement.js'
 import * as pageStyles from './GamePage.module.css'
-import * as cardStyles from '../Card/Card.module.css'
 
 const images = [
     '/img/Air.webp',
@@ -33,46 +32,48 @@ export function GamePage(selectedLevel = 'easy') {
     })
     container.appendChild(endBtn)
 
+    // Вставка карточек в HTML start
     const cardCount = levels[selectedLevel]
     const selectedImages = [...images].slice(0, Math.ceil(cardCount / 2))
     const cardsData = [...selectedImages, ...selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)
-
-    let flippedCards = []
-    let matchedCount = 0
+    // Вставка карточек в HTML end
 
     cardsData.forEach((image, index) => {
-        const card = Card(index, image, handleCardClick)
+        const cardId = index + image
+        const card = Card(cardId, image)
         cardsContainer.appendChild(card)
     })
 
-    function handleCardClick(id, image, cardEl, innerEl) {
-        if (flippedCards.find(c => c.cardId === id)) {
-            return
-        }
-        flippedCards.push({ cardId: id, image, cardEl, innerEl })
+    return { container, selectedImages, cardsData }
+}
 
-        if (flippedCards.length === 2) {
-            const [first, second] = flippedCards
+export function handleCardClick({ id, image, cardEl, innerEl, flippedCards, matchedCount, selectedImages }) {
+    flippedCards.push({ cardId: id, image, cardEl, innerEl })
 
-            if (first.image === second.image) {
-                matchedCount++
-                flippedCards = []
-                if (matchedCount === selectedImages.length) {
-                    setTimeout(() => alert('Ты победил! 🎉'), 300)
-                }
-            } else {
-                setTimeout(() => {
-                    first.innerEl.style.display = 'none'
-                    first.cardEl.querySelector(`.${cardStyles.back}`).style.display = 'block'
+    console.log('@1', flippedCards)
 
-                    second.innerEl.style.display = 'none'
-                    second.cardEl.querySelector(`.${cardStyles.back}`).style.display = 'block'
-
-                    flippedCards = []
-                }, 1000)
-            }
-        }
+    // здесь нужно убрать условие и менять стили при клике на первое нажатие снимать display none при втором сравнивать и либо оставлять у обоих display none если не совпали, либо делать для обеих display block
+    if (flippedCards[0]) {
+        const firstEl = flippedCards[0]
+        const cardFront = document.getElementById(`${firstEl.cardId}-front`)
+        cardFront.style.display = 'block'
     }
 
-    return container
+    if (flippedCards.length === 2) {
+        const [first, second] = flippedCards
+
+        console.log('@2', [first, second])
+
+        if (first.image === second.image) {
+            matchedCount++
+            flippedCards.pop()
+            flippedCards.pop()
+            console.log('@4', flippedCards, matchedCount)
+            if (matchedCount === selectedImages.length) {
+                setTimeout(() => alert('Ты победил! 🎉'), 300)
+            }
+        } else {
+            // здесь по-новому
+        }
+    }
 }

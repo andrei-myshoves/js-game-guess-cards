@@ -1,7 +1,7 @@
 import { GameMenu, menuItems } from './components/GameMenu/GameMenu.js'
 import { GameSettingsMenu } from './components/GameMenuSettings/GameMenuSettings.js'
 import { Layout } from './components/Layout/Layout.js'
-import { GamePage } from './components/GamePage/GamePage.js'
+import { GamePage, handleCardClick } from './components/GamePage/GamePage.js'
 import { startTimer, updateTimer, stopTimer, pauseTimer, resumeTimer } from './components/Timer/Timer.js'
 import './style.css'
 
@@ -128,27 +128,40 @@ function renderPageWithBack({
 }
 
 function renderGamePage(selectedLevel) {
+    let flippedCards = []
+    let matchedCount = 0
+
+    const GamePageResult = GamePage(selectedLevel)
+    const { container, selectedImages, cardsData } = GamePageResult
+
     const layout = Layout({
         title: 'Игра',
-        children: GamePage(selectedLevel),
+        children: container,
         showBack: true,
     })
     root.appendChild(layout)
 
+    cardsData.forEach((image, index) => {
+        const cardId = index + image
+        const cardElement = document.getElementById(cardId)
+        cardElement.addEventListener('click', () =>
+            handleCardClick({ id: cardId, image, flippedCards, matchedCount, selectedImages })
+        )
+    })
+
+    const endGame = () => {
+        stopTimer()
+        setPage('mainPage')
+    }
+
     const endBtn = document.getElementById('endGameBtn')
     if (endBtn) {
-        endBtn.addEventListener('click', () => {
-            stopTimer()
-            setPage('mainPage')
-        })
+        endBtn.addEventListener('click', endGame)
     }
 
     const backBtn = document.getElementById('backBtn')
     if (backBtn) {
-        backBtn.addEventListener('click', () => {
-            stopTimer()
-            setPage('mainPage')
-        })
+        backBtn.addEventListener('click', endGame)
     }
 
     if (localStorage.getItem('endTime')) {

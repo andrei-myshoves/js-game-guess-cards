@@ -129,7 +129,7 @@ function renderPageWithBack({
 
 function renderGamePage(selectedLevel) {
     let flippedCards = []
-    let matchedCount = 0
+    const gameState = { matchedCount: 0 }
 
     const GamePageResult = GamePage(selectedLevel)
     const { container, selectedImages, cardsData } = GamePageResult
@@ -145,7 +145,7 @@ function renderGamePage(selectedLevel) {
         const cardId = index + image
         const cardElement = document.getElementById(cardId)
         cardElement.addEventListener('click', () =>
-            handleCardClick({ id: cardId, image, flippedCards, matchedCount, selectedImages })
+            handleCardClick({ id: cardId, image, flippedCards, gameState, selectedImages })
         )
     })
 

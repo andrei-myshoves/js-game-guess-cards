@@ -47,33 +47,36 @@ export function GamePage(selectedLevel = 'easy') {
     return { container, selectedImages, cardsData }
 }
 
-export function handleCardClick({ id, image, cardEl, innerEl, flippedCards, matchedCount, selectedImages }) {
-    flippedCards.push({ cardId: id, image, cardEl, innerEl })
+export function handleCardClick({ id, image, flippedCards, gameState, selectedImages }) {
+    flippedCards.push({ cardId: id, image })
 
-    console.log('@1', flippedCards)
-
-    // здесь нужно убрать условие и менять стили при клике на первое нажатие снимать display none при втором сравнивать и либо оставлять у обоих display none если не совпали, либо делать для обеих display block
-    if (flippedCards[0]) {
-        const firstEl = flippedCards[0]
-        const cardFront = document.getElementById(`${firstEl.cardId}-front`)
-        cardFront.style.display = 'block'
-    }
+    // показать карту
+    const cardFront = document.getElementById(`${id}-front`)
+    cardFront.style.display = 'block'
 
     if (flippedCards.length === 2) {
         const [first, second] = flippedCards
 
-        console.log('@2', [first, second])
-
         if (first.image === second.image) {
-            matchedCount++
-            flippedCards.pop()
-            flippedCards.pop()
-            console.log('@4', flippedCards, matchedCount)
-            if (matchedCount === selectedImages.length) {
+            // если совпали
+            gameState.matchedCount++
+            flippedCards.length = 0
+
+            // проверяем победу
+            if (gameState.matchedCount === selectedImages.length) {
                 setTimeout(() => alert('Ты победил! 🎉'), 300)
             }
         } else {
-            // здесь по-новому
+            // если не совпали — скрыть обе обратно
+            setTimeout(() => {
+                const firstFront = document.getElementById(`${first.cardId}-front`)
+                const secondFront = document.getElementById(`${second.cardId}-front`)
+
+                if (firstFront) firstFront.style.display = 'none'
+                if (secondFront) secondFront.style.display = 'none'
+
+                flippedCards.length = 0
+            }, 800)
         }
     }
 }

@@ -32,49 +32,61 @@ export function GamePage(selectedLevel = 'easy') {
     })
     container.appendChild(endBtn)
 
-    // Вставка карточек в HTML start
     const cardCount = levels[selectedLevel]
     const selectedImages = [...images].slice(0, Math.ceil(cardCount / 2))
     const cardsData = [...selectedImages, ...selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)
-    // Вставка карточек в HTML end
 
     cardsData.forEach((image, index) => {
-        const cardId = index + image
+        const cardId = `card-${index}`
         const card = Card(cardId, image)
         cardsContainer.appendChild(card)
     })
 
+    // показать все карты на старте на 1 секунду
+    setTimeout(() => {
+        cardsData.forEach((image, index) => {
+            const cardId = `card-${index}`
+            const front = document.getElementById(`${cardId}-front`)
+            const back = document.getElementById(`${cardId}-back`)
+            if (front) front.style.display = 'none'
+            if (back) back.style.display = 'flex'
+        })
+    }, 1000)
+
     return { container, selectedImages, cardsData }
 }
 
+// обработка клика по карте
 export function handleCardClick({ id, image, flippedCards, gameState, selectedImages }) {
-    flippedCards.push({ cardId: id, image })
+    const cardFront = document.getElementById(`${id}-front`)
+    const cardBack = document.getElementById(`${id}-back`)
+
+    if (!cardFront || !cardBack) return
 
     // показать карту
-    const cardFront = document.getElementById(`${id}-front`)
     cardFront.style.display = 'block'
+    cardBack.style.display = 'none'
+
+    flippedCards.push({ cardId: id, image })
 
     if (flippedCards.length === 2) {
         const [first, second] = flippedCards
 
         if (first.image === second.image) {
-            // если совпали
             gameState.matchedCount++
             flippedCards.length = 0
 
-            // проверяем победу
             if (gameState.matchedCount === selectedImages.length) {
                 setTimeout(() => alert('Ты победил! 🎉'), 300)
             }
         } else {
-            // если не совпали — скрыть обе обратно
             setTimeout(() => {
-                const firstFront = document.getElementById(`${first.cardId}-front`)
-                const secondFront = document.getElementById(`${second.cardId}-front`)
-
-                if (firstFront) firstFront.style.display = 'none'
-                if (secondFront) secondFront.style.display = 'none'
-
+                flippedCards.forEach(c => {
+                    const f = document.getElementById(`${c.cardId}-front`)
+                    const b = document.getElementById(`${c.cardId}-back`)
+                    if (f) f.style.display = 'none'
+                    if (b) b.style.display = 'flex'
+                })
                 flippedCards.length = 0
             }, 800)
         }

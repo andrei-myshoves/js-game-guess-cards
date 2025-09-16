@@ -128,7 +128,7 @@ function renderPageWithBack({
 }
 
 function renderGamePage(selectedLevel) {
-    let flippedCards = []
+    const flippedCards = []
     const gameState = { matchedCount: 0 }
 
     const GamePageResult = GamePage(selectedLevel)
@@ -142,8 +142,9 @@ function renderGamePage(selectedLevel) {
     root.appendChild(layout)
 
     cardsData.forEach((image, index) => {
-        const cardId = index + image
+        const cardId = `card-${index}`
         const cardElement = document.getElementById(cardId)
+        if (!cardElement) return
         cardElement.addEventListener('click', () =>
             handleCardClick({ id: cardId, image, flippedCards, gameState, selectedImages })
         )
@@ -169,7 +170,6 @@ function renderGamePage(selectedLevel) {
         resumeTimer()
     }
 }
-
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
         pauseTimer()

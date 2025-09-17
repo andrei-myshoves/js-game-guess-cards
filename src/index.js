@@ -13,6 +13,12 @@ const levelTimes = {
     hard: 60,
 }
 
+const previewDurations = {
+    easy: 2500,
+    medium: 1500,
+    hard: 900,
+}
+
 export function setPage(page) {
     root.innerHTML = ''
     switch (page) {
@@ -129,7 +135,7 @@ function renderPageWithBack({
 
 function renderGamePage(selectedLevel) {
     const flippedCards = []
-    const gameState = { matchedCount: 0 }
+    const gameState = { matchedCount: 0, locked: false }
 
     const GamePageResult = GamePage(selectedLevel)
     const { container, selectedImages, cardsData } = GamePageResult
@@ -141,12 +147,38 @@ function renderGamePage(selectedLevel) {
     })
     root.appendChild(layout)
 
+    const previewMs = previewDurations[selectedLevel] ?? 1500
+
+    cardsData.forEach((_, index) => {
+        const cardId = `card-${index}`
+        const front = document.getElementById(`${cardId}-front`)
+        const back = document.getElementById(`${cardId}-back`)
+        if (front) front.style.display = 'block'
+        if (back) back.style.display = 'none'
+    })
+
+    setTimeout(() => {
+        cardsData.forEach((_, index) => {
+            const cardId = `card-${index}`
+            const front = document.getElementById(`${cardId}-front`)
+            const back = document.getElementById(`${cardId}-back`)
+            if (front) front.style.display = 'none'
+            if (back) back.style.display = 'flex'
+        })
+    }, previewMs)
+
     cardsData.forEach((image, index) => {
         const cardId = `card-${index}`
         const cardElement = document.getElementById(cardId)
         if (!cardElement) return
         cardElement.addEventListener('click', () =>
-            handleCardClick({ id: cardId, image, flippedCards, gameState, selectedImages })
+            handleCardClick({
+                id: cardId,
+                image,
+                flippedCards,
+                gameState,
+                selectedImages,
+            })
         )
     })
 
@@ -170,6 +202,7 @@ function renderGamePage(selectedLevel) {
         resumeTimer()
     }
 }
+
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
         pauseTimer()

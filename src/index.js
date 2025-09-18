@@ -2,7 +2,7 @@ import { GameMenu, menuItems } from './components/GameMenu/GameMenu.js'
 import { GameSettingsMenu } from './components/GameMenuSettings/GameMenuSettings.js'
 import { Layout } from './components/Layout/Layout.js'
 import { GamePage, handleCardClick } from './components/GamePage/GamePage.js'
-import { startTimer, updateTimer, stopTimer, pauseTimer, resumeTimer } from './components/Timer/Timer.js'
+import { startTimer, stopTimer, pauseTimer, resumeTimer } from './components/Timer/Timer.js'
 import './style.css'
 
 const root = document.getElementById('root')
@@ -13,12 +13,6 @@ const levelTimes = {
     hard: 60,
 }
 
-const previewDurations = {
-    easy: 2500,
-    medium: 1500,
-    hard: 900,
-}
-
 export function setPage(page) {
     root.innerHTML = ''
     switch (page) {
@@ -26,7 +20,6 @@ export function setPage(page) {
             renderMainMenu()
             break
         }
-
         case 'historyPage': {
             renderPageWithBack({
                 title: 'Здесь скоро будет история',
@@ -36,14 +29,10 @@ export function setPage(page) {
             })
             break
         }
-
-        case 'gamePage':
-        case 'gamePageWithCards': {
+        case 'gamePage': {
             const level = localStorage.getItem('selectedLevel')
-
             if (level) {
                 renderGamePage(level)
-                startTimer(levelTimes[level])
                 localStorage.removeItem('selectedLevel')
             } else {
                 renderPageWithBack({
@@ -55,7 +44,6 @@ export function setPage(page) {
             }
             break
         }
-
         case 'settingsPage': {
             renderPageWithBack({
                 title: 'Инструкция',
@@ -64,7 +52,6 @@ export function setPage(page) {
             })
             break
         }
-
         default: {
             console.warn(`Неизвестная страница: ${page}, возвращаемся в главное меню`)
             setPage('mainPage')
@@ -116,14 +103,12 @@ function renderPageWithBack({
                 setPage('gamePage')
             })
         }
-
         if (mediumBtn) {
             mediumBtn.addEventListener('click', () => {
                 localStorage.setItem('selectedLevel', 'medium')
                 setPage('gamePage')
             })
         }
-
         if (hardBtn) {
             hardBtn.addEventListener('click', () => {
                 localStorage.setItem('selectedLevel', 'hard')
@@ -137,8 +122,7 @@ function renderGamePage(selectedLevel) {
     const flippedCards = []
     const gameState = { matchedCount: 0, locked: false }
 
-    const GamePageResult = GamePage(selectedLevel)
-    const { container, selectedImages, cardsData } = GamePageResult
+    const { container, selectedImages, cardsData } = GamePage(selectedLevel)
 
     const layout = Layout({
         title: 'Игра',
@@ -147,60 +131,64 @@ function renderGamePage(selectedLevel) {
     })
     root.appendChild(layout)
 
-    const previewMs = previewDurations[selectedLevel] ?? 1500
-
+    // показываем карты 5 секунд
     cardsData.forEach((_, index) => {
-        const cardId = `card-${index}`
-        const front = document.getElementById(`${cardId}-front`)
-        const back = document.getElementById(`${cardId}-back`)
+        const front = document.getElementById(`card-${index}-front`)
+        const back = document.getElementById(`card-${index}-back`)
         if (front) front.style.display = 'block'
         if (back) back.style.display = 'none'
     })
 
-    setTimeout(() => {
-        cardsData.forEach((_, index) => {
-            const cardId = `card-${index}`
-            const front = document.getElementById(`${cardId}-front`)
-            const back = document.getElementById(`${cardId}-back`)
-            if (front) front.style.display = 'none'
-            if (back) back.style.display = 'flex'
-        })
-    }, previewMs)
-
-    cardsData.forEach((image, index) => {
-        const cardId = `card-${index}`
-        const cardElement = document.getElementById(cardId)
-        if (!cardElement) return
-        cardElement.addEventListener('click', () =>
-            handleCardClick({
-                id: cardId,
-                image,
-                flippedCards,
-                gameState,
-                selectedImages,
+    let previewTime = 5
+    const timerEl = document.getElementById('timer')
+    const previewInterval = setInterval(() => {
+        timerEl.textContent = `Запоминай: ${previewTime}`
+        previewTime--
+        if (previewTime < 0) {
+            clearInterval(previewInterval)
+            // закрываем карты
+            cardsData.forEach((_, index) => {
+                const front = document.getElementById(`card-${index}-front`)
+                const back = document.getElementById(`card-${index}-back`)
+                if (front) front.style.display = 'none'
+                if (back) back.style.display = 'flex'
             })
-        )
-    })
+            // запускаем основной таймер
+            startTimer(levelTimes[selectedLevel])
+            // активируем клики
+            cardsData.forEach((image, index) => {
+                const cardId = `card-${index}`
+                const cardElement = document.getElementById(cardId)
+                if (!cardElement) return
+                cardElement.addEventListener('click', () =>
+                    handleCardClick({
+                        id: cardId,
+                        image,
+                        flippedCards,
+                        gameState,
+                        selectedImages,
+                        onWin: () => {
+                            stopTimer()
+                            alert('Вы победили!')
+                            setPage('mainPage')
+                        },
+                    })
+                )
+            })
+        }
+    }, 1000)
 
     const endGame = () => {
         stopTimer()
+        alert('Вы проиграли!')
         setPage('mainPage')
     }
 
     const endBtn = document.getElementById('endGameBtn')
-    if (endBtn) {
-        endBtn.addEventListener('click', endGame)
-    }
+    if (endBtn) endBtn.addEventListener('click', endGame)
 
     const backBtn = document.getElementById('backBtn')
-    if (backBtn) {
-        backBtn.addEventListener('click', endGame)
-    }
-
-    if (localStorage.getItem('endTime')) {
-        updateTimer()
-        resumeTimer()
-    }
+    if (backBtn) backBtn.addEventListener('click', endGame)
 }
 
 document.addEventListener('visibilitychange', () => {

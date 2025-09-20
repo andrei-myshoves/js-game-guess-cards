@@ -1,60 +1,52 @@
-let timerInterval
-let remainingTime = 0
-let isPaused = false
+import { setPage } from '../../index.js'
+
+let intervalId
+let remainingTime
+let loseHandler = null
 
 export function startTimer(seconds) {
     remainingTime = seconds
-    localStorage.setItem('remainingTime', remainingTime)
-    isPaused = false
-
     updateTimer()
-    clearInterval(timerInterval)
-    timerInterval = setInterval(tick, 1000)
-}
 
-function tick() {
-    if (isPaused) return
-
-    remainingTime = parseInt(localStorage.getItem('remainingTime')) || 0
-
-    if (remainingTime > 0) {
+    intervalId = setInterval(() => {
         remainingTime--
-        localStorage.setItem('remainingTime', remainingTime)
-    }
+        updateTimer()
 
-    updateTimer()
-
-    if (remainingTime <= 0) {
-        clearInterval(timerInterval)
-        alert('Время вышло!')
-        localStorage.removeItem('remainingTime')
-    }
-}
-
-export function updateTimer() {
-    const minutes = String(Math.floor(remainingTime / 60)).padStart(2, '0')
-    const secs = String(remainingTime % 60).padStart(2, '0')
-
-    const timerEl = document.getElementById('timer')
-    if (timerEl) timerEl.textContent = `${minutes}:${secs}`
+        if (remainingTime <= 0) {
+            clearInterval(intervalId)
+            if (loseHandler) {
+                loseHandler()
+            } else {
+                alert('Время вышло! Вы проиграли.')
+                setPage('mainPage')
+            }
+        }
+    }, 1000)
 }
 
 export function stopTimer() {
-    clearInterval(timerInterval)
-    localStorage.removeItem('remainingTime')
-    remainingTime = 0
-    updateTimer()
+    clearInterval(intervalId)
 }
 
 export function pauseTimer() {
-    isPaused = true
-    clearInterval(timerInterval)
+    clearInterval(intervalId)
 }
 
 export function resumeTimer() {
     if (remainingTime > 0) {
-        isPaused = false
-        clearInterval(timerInterval)
-        timerInterval = setInterval(tick, 1000)
+        startTimer(remainingTime)
     }
+}
+
+export function updateTimer() {
+    const timerEl = document.getElementById('timer')
+    if (timerEl) {
+        const minutes = Math.floor(remainingTime / 60)
+        const seconds = remainingTime % 60
+        timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`
+    }
+}
+
+export function setLoseHandler(fn) {
+    loseHandler = fn
 }

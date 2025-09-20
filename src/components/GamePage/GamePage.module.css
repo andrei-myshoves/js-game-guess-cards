@@ -1,0 +1,7 @@
+.cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 16px;
+    justify-items: center;
+    padding: 16px;
+}

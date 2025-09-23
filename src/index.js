@@ -121,6 +121,7 @@ function renderPageWithBack({
 function renderGamePage(selectedLevel) {
     const flippedCards = []
     const gameState = { matchedCount: 0, locked: false }
+    let gameEnded = false
 
     const { container, selectedImages, cardsData } = GamePage(selectedLevel)
 
@@ -141,11 +142,18 @@ function renderGamePage(selectedLevel) {
 
     let previewTime = 5
     const timerEl = document.getElementById('timer')
+
+    stopTimer()
+
     const previewInterval = setInterval(() => {
-        timerEl.textContent = `Запоминай: ${previewTime}`
+        if (timerEl) {
+            timerEl.textContent = `Запоминай: ${previewTime}`
+        }
         previewTime--
+
         if (previewTime < 0) {
             clearInterval(previewInterval)
+
             // закрываем карты
             cardsData.forEach((_, index) => {
                 const front = document.getElementById(`card-${index}-front`)
@@ -153,8 +161,9 @@ function renderGamePage(selectedLevel) {
                 if (front) front.style.display = 'none'
                 if (back) back.style.display = 'flex'
             })
-            // запускаем основной таймер
+
             startTimer(levelTimes[selectedLevel])
+
             // активируем клики
             cardsData.forEach((image, index) => {
                 const cardId = `card-${index}`
@@ -168,6 +177,8 @@ function renderGamePage(selectedLevel) {
                         gameState,
                         selectedImages,
                         onWin: () => {
+                            if (gameEnded) return
+                            gameEnded = true
                             stopTimer()
                             alert('Вы победили!')
                             setPage('mainPage')
@@ -179,6 +190,9 @@ function renderGamePage(selectedLevel) {
     }, 1000)
 
     const endGame = () => {
+        if (gameEnded) return
+        gameEnded = true
+
         stopTimer()
         alert('Вы проиграли!')
         setPage('mainPage')

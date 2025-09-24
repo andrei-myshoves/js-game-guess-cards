@@ -133,7 +133,6 @@ function renderGamePage(selectedLevel) {
     root.appendChild(layout)
 
     const timerWrapper = document.getElementById('timer-wrapper')
-
     timerWrapper.innerHTML = ''
     const timerEl = TimerComponent()
     timerWrapper.appendChild(timerEl)
@@ -161,8 +160,6 @@ function renderGamePage(selectedLevel) {
                 if (back) back.style.display = 'flex'
             })
 
-            timerWrapper.innerHTML = ''
-            timerWrapper.appendChild(TimerComponent())
             startTimer(levelTimes[selectedLevel])
 
             // активируем клики
@@ -190,6 +187,7 @@ function renderGamePage(selectedLevel) {
 
     const endGame = () => {
         stopTimer()
+        clearInterval(previewInterval)
         alert('Вы проиграли!')
         setPage('mainPage')
     }

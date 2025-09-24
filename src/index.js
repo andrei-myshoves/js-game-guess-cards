@@ -3,6 +3,7 @@ import { GameSettingsMenu } from './components/GameMenuSettings/GameMenuSettings
 import { Layout } from './components/Layout/Layout.js'
 import { GamePage, handleCardClick } from './components/GamePage/GamePage.js'
 import { startTimer, stopTimer, pauseTimer, resumeTimer } from './components/Timer/Timer.js'
+import { TimerComponent } from './components/Timer/TimerComponent.js'
 import './style.css'
 
 const root = document.getElementById('root')
@@ -121,7 +122,6 @@ function renderPageWithBack({
 function renderGamePage(selectedLevel) {
     const flippedCards = []
     const gameState = { matchedCount: 0, locked: false }
-    let gameEnded = false
 
     const { container, selectedImages, cardsData } = GamePage(selectedLevel)
 
@@ -132,7 +132,13 @@ function renderGamePage(selectedLevel) {
     })
     root.appendChild(layout)
 
-    // показываем карты 5 секунд
+    const timerWrapper = document.getElementById('timer-wrapper')
+
+    timerWrapper.innerHTML = ''
+    const timerEl = TimerComponent()
+    timerWrapper.appendChild(timerEl)
+
+    // показываем карты на 5 секунд
     cardsData.forEach((_, index) => {
         const front = document.getElementById(`card-${index}-front`)
         const back = document.getElementById(`card-${index}-back`)
@@ -141,16 +147,9 @@ function renderGamePage(selectedLevel) {
     })
 
     let previewTime = 5
-    const timerEl = document.getElementById('timer')
-
-    stopTimer()
-
     const previewInterval = setInterval(() => {
-        if (timerEl) {
-            timerEl.textContent = `Запоминай: ${previewTime}`
-        }
+        timerEl.textContent = `Запоминай: ${previewTime}`
         previewTime--
-
         if (previewTime < 0) {
             clearInterval(previewInterval)
 
@@ -162,6 +161,8 @@ function renderGamePage(selectedLevel) {
                 if (back) back.style.display = 'flex'
             })
 
+            timerWrapper.innerHTML = ''
+            timerWrapper.appendChild(TimerComponent())
             startTimer(levelTimes[selectedLevel])
 
             // активируем клики
@@ -177,8 +178,6 @@ function renderGamePage(selectedLevel) {
                         gameState,
                         selectedImages,
                         onWin: () => {
-                            if (gameEnded) return
-                            gameEnded = true
                             stopTimer()
                             alert('Вы победили!')
                             setPage('mainPage')
@@ -190,9 +189,6 @@ function renderGamePage(selectedLevel) {
     }, 1000)
 
     const endGame = () => {
-        if (gameEnded) return
-        gameEnded = true
-
         stopTimer()
         alert('Вы проиграли!')
         setPage('mainPage')

@@ -4,6 +4,7 @@ import { Layout } from './components/Layout/Layout.js'
 import { GamePage, handleCardClick } from './components/GamePage/GamePage.js'
 import { startTimer, stopTimer, pauseTimer, resumeTimer } from './components/Timer/Timer.js'
 import { TimerComponent } from './components/Timer/TimerComponent.js'
+import { Button } from './components/Button/Button.js'
 import './style.css'
 
 const root = document.getElementById('root')
@@ -132,6 +133,18 @@ function renderGamePage(selectedLevel) {
     })
     root.appendChild(layout)
 
+    const guessedEl = document.getElementById('guessedCount')
+    const remainingEl = document.getElementById('remainingCount')
+    if (guessedEl) guessedEl.textContent = '0'
+    if (remainingEl) remainingEl.textContent = selectedImages.length
+
+    const endBtn = Button({
+        id: 'endGameBtn',
+        text: 'Завершить игру',
+        extraClass: '',
+    })
+    layout.appendChild(endBtn)
+
     const timerWrapper = document.getElementById('timer-wrapper')
     timerWrapper.innerHTML = ''
     const timerEl = TimerComponent()
@@ -160,6 +173,7 @@ function renderGamePage(selectedLevel) {
                 if (back) back.style.display = 'flex'
             })
 
+            // теперь таймер начинает отсчёт как обычно
             startTimer(levelTimes[selectedLevel])
 
             // активируем клики
@@ -192,9 +206,7 @@ function renderGamePage(selectedLevel) {
         setPage('mainPage')
     }
 
-    const endBtn = document.getElementById('endGameBtn')
     if (endBtn) endBtn.addEventListener('click', endGame)
-
     const backBtn = document.getElementById('backBtn')
     if (backBtn) backBtn.addEventListener('click', endGame)
 }

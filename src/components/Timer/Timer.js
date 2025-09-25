@@ -1,10 +1,13 @@
 import { setPage } from '../../index.js'
 
-let intervalId
-let remainingTime
+let intervalId = null
+let remainingTime = 0
 let loseHandler = null
 
 export function startTimer(seconds) {
+    clearInterval(intervalId)
+    intervalId = null
+
     remainingTime = seconds
     updateTimer()
 
@@ -14,6 +17,7 @@ export function startTimer(seconds) {
 
         if (remainingTime <= 0) {
             clearInterval(intervalId)
+            intervalId = null
             if (loseHandler) {
                 loseHandler()
             } else {
@@ -26,14 +30,17 @@ export function startTimer(seconds) {
 
 export function stopTimer() {
     clearInterval(intervalId)
+    intervalId = null
+    remainingTime = 0
 }
 
 export function pauseTimer() {
     clearInterval(intervalId)
+    intervalId = null
 }
 
 export function resumeTimer() {
-    if (remainingTime > 0) {
+    if (remainingTime > 0 && !intervalId) {
         startTimer(remainingTime)
     }
 }

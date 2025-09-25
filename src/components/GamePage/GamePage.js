@@ -1,4 +1,3 @@
-import { Button } from '../Button/Button.js'
 import { Card } from '../Card/Card.js'
 import { htmlToElement } from '../../utils/htmlToELement.js'
 import * as pageStyles from './GamePage.module.css'
@@ -21,8 +20,8 @@ export function GamePage(selectedLevel = 'easy') {
       <div class="${pageStyles.topBar}">
         <div id="timer-wrapper"></div>
         <div id="progress" class="${pageStyles.progress}">
-          <div>Вы угадали: <span id="guessedCount">0</span></div>
-          <div>Осталось угадать: <span id="remainingCount">0</span></div>
+          <div>Вы угадали: <span id="guessedCount"></span></div>
+          <div>Осталось угадать: <span id="remainingCount"></span></div>
         </div>
       </div>
       <div id="cards-container" class="${pageStyles.cardsGrid}"></div>
@@ -30,14 +29,6 @@ export function GamePage(selectedLevel = 'easy') {
   `)
 
     const cardsContainer = container.querySelector('#cards-container')
-
-    // кнопка завершения
-    const endBtn = Button({
-        id: 'endGameBtn',
-        text: 'Завершить игру',
-        extraClass: '',
-    })
-    container.appendChild(endBtn)
 
     const cardCount = levels[selectedLevel]
     const selectedImages = [...images].slice(0, Math.ceil(cardCount / 2))
@@ -48,11 +39,6 @@ export function GamePage(selectedLevel = 'easy') {
         const card = Card(cardId, image)
         cardsContainer.appendChild(card)
     })
-
-    const guessedEl = container.querySelector('#guessedCount')
-    const remainingEl = container.querySelector('#remainingCount')
-    guessedEl.textContent = '0'
-    remainingEl.textContent = selectedImages.length
 
     return { container, selectedImages, cardsData }
 }
@@ -83,8 +69,8 @@ export function handleCardClick({ id, image, flippedCards, gameState, selectedIm
             // обновляем прогресс
             const guessedEl = document.getElementById('guessedCount')
             const remainingEl = document.getElementById('remainingCount')
-            guessedEl.textContent = gameState.matchedCount
-            remainingEl.textContent = selectedImages.length - gameState.matchedCount
+            if (guessedEl) guessedEl.textContent = gameState.matchedCount
+            if (remainingEl) remainingEl.textContent = selectedImages.length - gameState.matchedCount
 
             if (gameState.matchedCount === selectedImages.length) {
                 setTimeout(() => onWin(), 300)

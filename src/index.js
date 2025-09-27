@@ -3,6 +3,7 @@ import { GameSettingsMenu } from './components/GameMenuSettings/GameMenuSettings
 import { Layout } from './components/Layout/Layout.js'
 import { GamePage, handleCardClick } from './components/GamePage/GamePage.js'
 import { startTimer, stopTimer, pauseTimer, resumeTimer } from './components/Timer/Timer.js'
+import { Button } from './components/Button/Button.js'
 import './style.css'
 
 const root = document.getElementById('root')
@@ -122,16 +123,23 @@ function renderGamePage(selectedLevel) {
     const flippedCards = []
     const gameState = { matchedCount: 0, locked: false }
 
-    const { container, selectedImages, cardsData } = GamePage(selectedLevel)
+    const { container: _container, selectedImages, cardsData, cardCount } = GamePage(selectedLevel)
 
     const layout = Layout({
         title: 'Игра',
-        children: container,
+        children: _container,
         showBack: true,
     })
     root.appendChild(layout)
 
-    // показываем карты 5 секунд
+    const endBtn = Button({
+        id: 'endGameBtn',
+        text: 'Завершить игру',
+        extraClass: '',
+    })
+    layout.appendChild(endBtn)
+
+    // показываем карты на 5 секунд
     cardsData.forEach((_, index) => {
         const front = document.getElementById(`card-${index}-front`)
         const back = document.getElementById(`card-${index}-back`)
@@ -142,7 +150,7 @@ function renderGamePage(selectedLevel) {
     let previewTime = 5
     const timerEl = document.getElementById('timer')
     const previewInterval = setInterval(() => {
-        timerEl.textContent = `Запоминай: ${previewTime}`
+        if (timerEl) timerEl.textContent = `Запоминай: ${previewTime}`
         previewTime--
         if (previewTime < 0) {
             clearInterval(previewInterval)
@@ -153,9 +161,11 @@ function renderGamePage(selectedLevel) {
                 if (front) front.style.display = 'none'
                 if (back) back.style.display = 'flex'
             })
-            // запускаем основной таймер
+
+            // основной таймер
             startTimer(levelTimes[selectedLevel])
-            // активируем клики
+
+            // активируем клики на карты
             cardsData.forEach((image, index) => {
                 const cardId = `card-${index}`
                 const cardElement = document.getElementById(cardId)
@@ -167,6 +177,7 @@ function renderGamePage(selectedLevel) {
                         flippedCards,
                         gameState,
                         selectedImages,
+                        cardCount,
                         onWin: () => {
                             stopTimer()
                             alert('Вы победили!')
@@ -180,13 +191,12 @@ function renderGamePage(selectedLevel) {
 
     const endGame = () => {
         stopTimer()
+        clearInterval(previewInterval)
         alert('Вы проиграли!')
         setPage('mainPage')
     }
 
-    const endBtn = document.getElementById('endGameBtn')
     if (endBtn) endBtn.addEventListener('click', endGame)
-
     const backBtn = document.getElementById('backBtn')
     if (backBtn) backBtn.addEventListener('click', endGame)
 }

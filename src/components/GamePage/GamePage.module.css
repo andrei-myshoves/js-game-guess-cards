@@ -3,23 +3,6 @@
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 16px;
     justify-items: center;
-    padding: 16px;
-    margin-bottom: 20px;
-}
-
-.topBar {
-    align-items: center;
-    margin: 10px 16px;
-}
-
-.progress {
-    text-align: right;
-    font-size: 14px;
-    line-height: 1.4;
-}
-
-.progress span {
-    display: inline-block;
-    min-width: 2ch;
-    font-family: monospace;
+    width: 100%;
+    padding: 16px 0;
 }

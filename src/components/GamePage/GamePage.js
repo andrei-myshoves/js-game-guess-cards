@@ -1,6 +1,7 @@
 import { Card } from '../Card/Card.js'
 import { htmlToElement } from '../../utils/htmlToELement.js'
 import * as pageStyles from './GamePage.module.css'
+import { GameMenuHeader } from '../GameMenuHeader/GameMenuHeader.js'
 
 const images = [
     '/img/Air.webp',
@@ -15,24 +16,21 @@ const images = [
 const levels = { easy: 6, medium: 10, hard: 16 }
 
 export function GamePage(selectedLevel = 'easy') {
-    const container = htmlToElement(`
-    <div>
-      <div class="${pageStyles.topBar}">
-        <div id="timer-wrapper"></div>
-        <div id="progress" class="${pageStyles.progress}">
-          <div>Вы угадали: <span id="guessedCount"></span></div>
-          <div>Осталось угадать: <span id="remainingCount"></span></div>
-        </div>
-      </div>
-      <div id="cards-container" class="${pageStyles.cardsGrid}"></div>
-    </div>
-  `)
+    const container = htmlToElement(`<div></div>`)
 
-    const cardsContainer = container.querySelector('#cards-container')
+    // верхняя панель (таймер + прогресс)
+    const header = GameMenuHeader()
+    container.appendChild(header)
+
+    // сетка карточек
+    const cardsContainer = htmlToElement(`
+    <div id="cards-container" class="${pageStyles.cardsGrid}"></div>
+  `)
+    container.appendChild(cardsContainer)
 
     const cardCount = levels[selectedLevel]
-    const selectedImages = [...images].slice(0, Math.ceil(cardCount / 2))
-    const cardsData = [...selectedImages, ...selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)
+    const _selectedImages = [...images].slice(0, Math.ceil(cardCount / 2))
+    const cardsData = [..._selectedImages, ..._selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)
 
     cardsData.forEach((image, index) => {
         const cardId = `card-${index}`
@@ -40,10 +38,16 @@ export function GamePage(selectedLevel = 'easy') {
         cardsContainer.appendChild(card)
     })
 
-    return { container, selectedImages, cardsData }
+    // инициализация прогресса
+    const guessedEl = document.getElementById('guessedCount')
+    const remainingEl = document.getElementById('remainingCount')
+    if (guessedEl) guessedEl.textContent = '0'
+    if (remainingEl) remainingEl.textContent = String(cardCount / 2)
+
+    return { container, selectedImages: _selectedImages, cardsData, cardCount }
 }
 
-export function handleCardClick({ id, image, flippedCards, gameState, selectedImages, onWin }) {
+export function handleCardClick({ id, image, flippedCards, gameState, cardCount, onWin }) {
     if (gameState.locked) return
 
     const cardFront = document.getElementById(`${id}-front`)
@@ -51,7 +55,6 @@ export function handleCardClick({ id, image, flippedCards, gameState, selectedIm
 
     if (!cardFront || !cardBack || cardFront.style.display === 'block') return
 
-    // открыть карту
     cardFront.style.display = 'block'
     cardBack.style.display = 'none'
 
@@ -66,13 +69,12 @@ export function handleCardClick({ id, image, flippedCards, gameState, selectedIm
             flippedCards.length = 0
             gameState.locked = false
 
-            // обновляем прогресс
             const guessedEl = document.getElementById('guessedCount')
             const remainingEl = document.getElementById('remainingCount')
-            if (guessedEl) guessedEl.textContent = gameState.matchedCount
-            if (remainingEl) remainingEl.textContent = selectedImages.length - gameState.matchedCount
+            if (guessedEl) guessedEl.textContent = String(gameState.matchedCount)
+            if (remainingEl) remainingEl.textContent = String(cardCount / 2 - gameState.matchedCount)
 
-            if (gameState.matchedCount === selectedImages.length) {
+            if (gameState.matchedCount === cardCount / 2) {
                 setTimeout(() => onWin(), 300)
             }
         } else {

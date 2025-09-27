@@ -3,7 +3,6 @@ import { GameSettingsMenu } from './components/GameMenuSettings/GameMenuSettings
 import { Layout } from './components/Layout/Layout.js'
 import { GamePage, handleCardClick } from './components/GamePage/GamePage.js'
 import { startTimer, stopTimer, pauseTimer, resumeTimer } from './components/Timer/Timer.js'
-import { TimerComponent } from './components/Timer/TimerComponent.js'
 import { Button } from './components/Button/Button.js'
 import './style.css'
 
@@ -124,19 +123,14 @@ function renderGamePage(selectedLevel) {
     const flippedCards = []
     const gameState = { matchedCount: 0, locked: false }
 
-    const { container, selectedImages, cardsData } = GamePage(selectedLevel)
+    const { container: _container, selectedImages, cardsData, cardCount } = GamePage(selectedLevel)
 
     const layout = Layout({
         title: 'Игра',
-        children: container,
+        children: _container,
         showBack: true,
     })
     root.appendChild(layout)
-
-    const guessedEl = document.getElementById('guessedCount')
-    const remainingEl = document.getElementById('remainingCount')
-    if (guessedEl) guessedEl.textContent = '0'
-    if (remainingEl) remainingEl.textContent = selectedImages.length
 
     const endBtn = Button({
         id: 'endGameBtn',
@@ -144,11 +138,6 @@ function renderGamePage(selectedLevel) {
         extraClass: '',
     })
     layout.appendChild(endBtn)
-
-    const timerWrapper = document.getElementById('timer-wrapper')
-    timerWrapper.innerHTML = ''
-    const timerEl = TimerComponent()
-    timerWrapper.appendChild(timerEl)
 
     // показываем карты на 5 секунд
     cardsData.forEach((_, index) => {
@@ -159,12 +148,12 @@ function renderGamePage(selectedLevel) {
     })
 
     let previewTime = 5
+    const timerEl = document.getElementById('timer')
     const previewInterval = setInterval(() => {
-        timerEl.textContent = `Запоминай: ${previewTime}`
+        if (timerEl) timerEl.textContent = `Запоминай: ${previewTime}`
         previewTime--
         if (previewTime < 0) {
             clearInterval(previewInterval)
-
             // закрываем карты
             cardsData.forEach((_, index) => {
                 const front = document.getElementById(`card-${index}-front`)
@@ -173,10 +162,10 @@ function renderGamePage(selectedLevel) {
                 if (back) back.style.display = 'flex'
             })
 
-            // теперь таймер начинает отсчёт как обычно
+            // основной таймер
             startTimer(levelTimes[selectedLevel])
 
-            // активируем клики
+            // активируем клики на карты
             cardsData.forEach((image, index) => {
                 const cardId = `card-${index}`
                 const cardElement = document.getElementById(cardId)
@@ -188,6 +177,7 @@ function renderGamePage(selectedLevel) {
                         flippedCards,
                         gameState,
                         selectedImages,
+                        cardCount,
                         onWin: () => {
                             stopTimer()
                             alert('Вы победили!')

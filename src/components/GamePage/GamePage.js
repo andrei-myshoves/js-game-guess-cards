@@ -13,7 +13,7 @@ const images = [
     '/img/Water.webp',
 ]
 
-const levels = { easy: 6, medium: 10, hard: 16 }
+const levels = { easy: 6, medium: 10, hard: 14 }
 
 export function GamePage(selectedLevel = 'easy') {
     const container = htmlToElement(`<div></div>`)
@@ -38,13 +38,13 @@ export function GamePage(selectedLevel = 'easy') {
         cardsContainer.appendChild(card)
     })
 
-    // инициализация прогресса
-    const guessedEl = document.getElementById('guessedCount')
-    const remainingEl = document.getElementById('remainingCount')
-    if (guessedEl) guessedEl.textContent = '0'
-    if (remainingEl) remainingEl.textContent = String(cardCount / 2)
-
-    return { container, selectedImages: _selectedImages, cardsData, cardCount }
+    return {
+        container,
+        selectedImages: _selectedImages,
+        cardsData,
+        cardCount,
+        pairCount: cardCount / 2,
+    }
 }
 
 export function handleCardClick({ id, image, flippedCards, gameState, cardCount, onWin }) {

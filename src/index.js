@@ -123,7 +123,7 @@ function renderGamePage(selectedLevel) {
     const flippedCards = []
     const gameState = { matchedCount: 0, locked: false }
 
-    const { container: _container, selectedImages, cardsData, cardCount } = GamePage(selectedLevel)
+    const { container: _container, selectedImages, cardsData, cardCount, pairCount } = GamePage(selectedLevel)
 
     const layout = Layout({
         title: 'Игра',
@@ -131,6 +131,11 @@ function renderGamePage(selectedLevel) {
         showBack: true,
     })
     root.appendChild(layout)
+
+    const guessedEl = document.getElementById('guessedCount')
+    const remainingEl = document.getElementById('remainingCount')
+    if (guessedEl) guessedEl.textContent = '0'
+    if (remainingEl) remainingEl.textContent = String(pairCount)
 
     const endBtn = Button({
         id: 'endGameBtn',

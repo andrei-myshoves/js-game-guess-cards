@@ -10,12 +10,12 @@
 }
 
 .timer {
-    font-size: 24px;
+    font-size: 25px;
     font-weight: bold;
 }
 
 .progress {
     text-align: right;
-    font-size: 16px;
+    font-size: 18px;
     line-height: 1.4;
 }

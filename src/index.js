@@ -123,11 +123,11 @@ function renderGamePage(selectedLevel) {
     const flippedCards = []
     const gameState = { matchedCount: 0, locked: false }
 
-    const { container: _container, selectedImages, cardsData, cardCount } = GamePage(selectedLevel)
+    const { container, selectedImages, cardsData, cardCount } = GamePage(selectedLevel)
 
     const layout = Layout({
         title: 'Игра',
-        children: _container,
+        children: container,
         showBack: true,
     })
     root.appendChild(layout)
@@ -168,7 +168,7 @@ function renderGamePage(selectedLevel) {
         previewTime--
         if (previewTime < 0) {
             clearInterval(previewInterval)
-            // закрываем карты
+
             cardsData.forEach((_, index) => {
                 const front = document.getElementById(`card-${index}-front`)
                 const back = document.getElementById(`card-${index}-back`)
@@ -180,10 +180,8 @@ function renderGamePage(selectedLevel) {
                 }
             })
 
-            // основной таймер
             startTimer(levelTimes[selectedLevel])
 
-            // активируем клики на карты
             cardsData.forEach((image, index) => {
                 const cardId = `card-${index}`
                 const cardElement = document.getElementById(cardId)

@@ -18,11 +18,9 @@ const levels = { easy: 6, medium: 10, hard: 14 }
 export function GamePage(selectedLevel = 'easy') {
     const container = htmlToElement(`<div></div>`)
 
-    // верхняя панель (таймер + прогресс)
     const header = GameMenuHeader()
     container.appendChild(header)
 
-    // сетка карточек
     const cardsContainer = htmlToElement(`
     <div id="cards-container" class="${pageStyles.cardsGrid}"></div>
   `)
@@ -30,8 +28,8 @@ export function GamePage(selectedLevel = 'easy') {
 
     const cardCount = levels[selectedLevel]
     const pairCount = Math.ceil(cardCount / 2)
-    const _selectedImages = [...images].slice(0, pairCount)
-    const cardsData = [..._selectedImages, ..._selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)
+    const selectedImages = [...images].slice(0, pairCount)
+    const cardsData = [...selectedImages, ...selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)
 
     cardsData.forEach((image, index) => {
         const cardId = `card-${index}`
@@ -48,7 +46,7 @@ export function GamePage(selectedLevel = 'easy') {
         remainingEl.textContent = String(pairCount)
     }
 
-    return { container, selectedImages: _selectedImages, cardsData, cardCount }
+    return { container, selectedImages, cardsData, cardCount }
 }
 
 export function handleCardClick({ id, image, flippedCards, gameState, cardCount, onWin }) {

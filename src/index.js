@@ -123,7 +123,7 @@ function renderGamePage(selectedLevel) {
     const flippedCards = []
     const gameState = { matchedCount: 0, locked: false }
 
-    const { container: _container, selectedImages, cardsData, cardCount, pairCount } = GamePage(selectedLevel)
+    const { container: _container, selectedImages, cardsData, cardCount } = GamePage(selectedLevel)
 
     const layout = Layout({
         title: 'Игра',
@@ -132,11 +132,6 @@ function renderGamePage(selectedLevel) {
     })
     root.appendChild(layout)
 
-    const guessedEl = document.getElementById('guessedCount')
-    const remainingEl = document.getElementById('remainingCount')
-    if (guessedEl) guessedEl.textContent = '0'
-    if (remainingEl) remainingEl.textContent = String(pairCount)
-
     const endBtn = Button({
         id: 'endGameBtn',
         text: 'Завершить игру',
@@ -144,18 +139,32 @@ function renderGamePage(selectedLevel) {
     })
     layout.appendChild(endBtn)
 
-    // показываем карты на 5 секунд
+    const guessedEl = document.getElementById('guessedCount')
+    const remainingEl = document.getElementById('remainingCount')
+    if (guessedEl) {
+        guessedEl.textContent = '0'
+    }
+    if (remainingEl) {
+        remainingEl.textContent = String(cardCount / 2)
+    }
+
     cardsData.forEach((_, index) => {
         const front = document.getElementById(`card-${index}-front`)
         const back = document.getElementById(`card-${index}-back`)
-        if (front) front.style.display = 'block'
-        if (back) back.style.display = 'none'
+        if (front) {
+            front.style.display = 'block'
+        }
+        if (back) {
+            back.style.display = 'none'
+        }
     })
 
     let previewTime = 5
     const timerEl = document.getElementById('timer')
     const previewInterval = setInterval(() => {
-        if (timerEl) timerEl.textContent = `Запоминай: ${previewTime}`
+        if (timerEl) {
+            timerEl.textContent = `Запоминай: ${previewTime}`
+        }
         previewTime--
         if (previewTime < 0) {
             clearInterval(previewInterval)
@@ -163,8 +172,12 @@ function renderGamePage(selectedLevel) {
             cardsData.forEach((_, index) => {
                 const front = document.getElementById(`card-${index}-front`)
                 const back = document.getElementById(`card-${index}-back`)
-                if (front) front.style.display = 'none'
-                if (back) back.style.display = 'flex'
+                if (front) {
+                    front.style.display = 'none'
+                }
+                if (back) {
+                    back.style.display = 'flex'
+                }
             })
 
             // основной таймер
@@ -174,7 +187,9 @@ function renderGamePage(selectedLevel) {
             cardsData.forEach((image, index) => {
                 const cardId = `card-${index}`
                 const cardElement = document.getElementById(cardId)
-                if (!cardElement) return
+                if (!cardElement) {
+                    return
+                }
                 cardElement.addEventListener('click', () =>
                     handleCardClick({
                         id: cardId,
@@ -201,9 +216,13 @@ function renderGamePage(selectedLevel) {
         setPage('mainPage')
     }
 
-    if (endBtn) endBtn.addEventListener('click', endGame)
+    if (endBtn) {
+        endBtn.addEventListener('click', endGame)
+    }
     const backBtn = document.getElementById('backBtn')
-    if (backBtn) backBtn.addEventListener('click', endGame)
+    if (backBtn) {
+        backBtn.addEventListener('click', endGame)
+    }
 }
 
 document.addEventListener('visibilitychange', () => {

@@ -29,7 +29,8 @@ export function GamePage(selectedLevel = 'easy') {
     container.appendChild(cardsContainer)
 
     const cardCount = levels[selectedLevel]
-    const _selectedImages = [...images].slice(0, Math.ceil(cardCount / 2))
+    const pairCount = Math.ceil(cardCount / 2)
+    const _selectedImages = [...images].slice(0, pairCount)
     const cardsData = [..._selectedImages, ..._selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)
 
     cardsData.forEach((image, index) => {
@@ -38,22 +39,29 @@ export function GamePage(selectedLevel = 'easy') {
         cardsContainer.appendChild(card)
     })
 
-    return {
-        container,
-        selectedImages: _selectedImages,
-        cardsData,
-        cardCount,
-        pairCount: cardCount / 2,
+    const guessedEl = document.getElementById('guessedCount')
+    const remainingEl = document.getElementById('remainingCount')
+    if (guessedEl) {
+        guessedEl.textContent = '0'
     }
+    if (remainingEl) {
+        remainingEl.textContent = String(pairCount)
+    }
+
+    return { container, selectedImages: _selectedImages, cardsData, cardCount }
 }
 
 export function handleCardClick({ id, image, flippedCards, gameState, cardCount, onWin }) {
-    if (gameState.locked) return
+    if (gameState.locked) {
+        return
+    }
 
     const cardFront = document.getElementById(`${id}-front`)
     const cardBack = document.getElementById(`${id}-back`)
 
-    if (!cardFront || !cardBack || cardFront.style.display === 'block') return
+    if (!cardFront || !cardBack || cardFront.style.display === 'block') {
+        return
+    }
 
     cardFront.style.display = 'block'
     cardBack.style.display = 'none'
@@ -71,8 +79,12 @@ export function handleCardClick({ id, image, flippedCards, gameState, cardCount,
 
             const guessedEl = document.getElementById('guessedCount')
             const remainingEl = document.getElementById('remainingCount')
-            if (guessedEl) guessedEl.textContent = String(gameState.matchedCount)
-            if (remainingEl) remainingEl.textContent = String(cardCount / 2 - gameState.matchedCount)
+            if (guessedEl) {
+                guessedEl.textContent = String(gameState.matchedCount)
+            }
+            if (remainingEl) {
+                remainingEl.textContent = String(cardCount / 2 - gameState.matchedCount)
+            }
 
             if (gameState.matchedCount === cardCount / 2) {
                 setTimeout(() => onWin(), 300)
@@ -82,8 +94,12 @@ export function handleCardClick({ id, image, flippedCards, gameState, cardCount,
                 flippedCards.forEach(c => {
                     const f = document.getElementById(`${c.cardId}-front`)
                     const b = document.getElementById(`${c.cardId}-back`)
-                    if (f) f.style.display = 'none'
-                    if (b) b.style.display = 'flex'
+                    if (f) {
+                        f.style.display = 'none'
+                    }
+                    if (b) {
+                        b.style.display = 'flex'
+                    }
                 })
                 flippedCards.length = 0
                 gameState.locked = false

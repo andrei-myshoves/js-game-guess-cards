@@ -15,6 +15,13 @@ const images = [
 
 const levels = { easy: 6, medium: 10, hard: 14 }
 
+function getGridClass(level) {
+    if (level === 'easy') return pageStyles.easyGrid
+    if (level === 'medium') return pageStyles.mediumGrid
+    if (level === 'hard') return pageStyles.hardGrid
+    return pageStyles.easyGrid
+}
+
 export function GamePage(selectedLevel = 'easy') {
     const container = htmlToElement(`<div></div>`)
 
@@ -22,8 +29,9 @@ export function GamePage(selectedLevel = 'easy') {
     container.appendChild(header)
 
     const cardsContainer = htmlToElement(`
-    <div id="cards-container" class="${pageStyles.cardsGrid}"></div>
-  `)
+  <div id="cards-container" class="${pageStyles.cardsGrid} ${getGridClass(selectedLevel)}"></div>
+`)
+
     container.appendChild(cardsContainer)
 
     const cardCount = levels[selectedLevel]

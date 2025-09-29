@@ -1,8 +1,45 @@
 .cardsGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 16px;
     justify-items: center;
     width: 100%;
-    padding: 16px 0;
+    justify-content: center;
+    max-width: 1200px;
+    padding: 16px;
+}
+
+.easyGrid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.mediumGrid {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.hardGrid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+@media (min-width: 481px) {
+    .mediumGrid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .hardGrid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (min-width: 801px) {
+    .easyGrid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    }
+
+    .mediumGrid {
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    }
+
+    .hardGrid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
 }

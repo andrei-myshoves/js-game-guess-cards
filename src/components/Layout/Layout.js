@@ -3,14 +3,24 @@ import { htmlToElement } from '../../utils/htmlToELement.js'
 import * as styles from './Layout.module.css'
 
 export function Layout({ title = '', children = '', showBack = false }) {
-    return htmlToElement(`
-    <div class="${styles.container}">
-      <div class="layout">
-        ${Header(title, showBack).outerHTML}
-        <div class="content">
-          ${children instanceof HTMLElement ? children.outerHTML : children}
+    const layoutEl = htmlToElement(`
+      <div class="${styles.container}">
+        <div class="${styles.layout}">
+          ${Header(title, showBack).outerHTML}
+          <div id="childrenContainer"></div>
         </div>
       </div>
-    </div>
-  `)
+    `)
+
+    const childrenContainer = layoutEl.querySelector('#childrenContainer')
+
+    if (childrenContainer) {
+        if (children instanceof HTMLElement) {
+            childrenContainer.appendChild(children)
+        } else {
+            childrenContainer.innerHTML = children
+        }
+    }
+
+    return layoutEl
 }

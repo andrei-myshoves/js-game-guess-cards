@@ -4,20 +4,26 @@ import * as styles from './Layout.module.css'
 
 export function Layout({ title = '', children = '', showBack = false }) {
     const layoutEl = htmlToElement(`
-    <div class="${styles.container}">
-      <div class="${styles.layout}">
-        ${Header(title, showBack).outerHTML}
-        <div id="childrenContainer"></div>
-      </div>
-    </div>
-  `)
+        <div class="${styles.container}">
+            <div class="${styles.layout}">
+                <div id="headerContainer"></div>
+                <div id="childrenContainer"></div>
+            </div>
+        </div>
+    `)
 
     layoutEl.getElementById = function (id) {
         return this.querySelector(`#${id}`)
     }
 
-    const childrenContainer = layoutEl.getElementById('childrenContainer')
+    const headerContainer = layoutEl.getElementById('headerContainer')
+    if (title) {
+        headerContainer.appendChild(Header(title, showBack))
+    } else {
+        headerContainer.remove()
+    }
 
+    const childrenContainer = layoutEl.getElementById('childrenContainer')
     if (childrenContainer) {
         if (children instanceof HTMLElement) {
             childrenContainer.appendChild(children)

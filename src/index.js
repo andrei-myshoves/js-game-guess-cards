@@ -63,8 +63,12 @@ export function setPage(page) {
 }
 
 function renderMainMenu() {
-    const menu = GameMenu()
-    root.appendChild(menu)
+    const layout = Layout({
+        children: GameMenu(),
+        showBack: false,
+    })
+
+    root.appendChild(layout)
 
     menuItems.forEach(item => {
         const btn = document.getElementById(item.id)

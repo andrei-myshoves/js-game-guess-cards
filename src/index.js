@@ -63,8 +63,12 @@ export function setPage(page) {
 }
 
 function renderMainMenu() {
-    const menu = GameMenu()
-    root.appendChild(menu)
+    const layout = Layout({
+        children: GameMenu(),
+        showBack: false,
+    })
+
+    root.appendChild(layout)
 
     menuItems.forEach(item => {
         const btn = document.getElementById(item.id)
@@ -123,7 +127,7 @@ function renderGamePage(selectedLevel) {
     const flippedCards = []
     const gameState = { matchedCount: 0, locked: false }
 
-    const { container, selectedImages, cardsData, cardCount } = GamePage(selectedLevel)
+    const { container, cardsData, cardCount } = GamePage(selectedLevel)
 
     const layout = Layout({
         title: 'Игра',
@@ -137,7 +141,10 @@ function renderGamePage(selectedLevel) {
         text: 'Завершить игру',
         extraClass: '',
     })
-    layout.appendChild(endBtn)
+    const childrenContainer = document.getElementById('childrenContainer')
+    if (childrenContainer) {
+        childrenContainer.appendChild(endBtn)
+    }
 
     const guessedEl = document.getElementById('guessedCount')
     const remainingEl = document.getElementById('remainingCount')
@@ -194,7 +201,6 @@ function renderGamePage(selectedLevel) {
                         image,
                         flippedCards,
                         gameState,
-                        selectedImages,
                         cardCount,
                         onWin: () => {
                             stopTimer()

@@ -15,18 +15,24 @@ const images = [
 
 const levels = { easy: 6, medium: 10, hard: 14 }
 
+function getGridClass(cardCount) {
+    if (cardCount <= 6) return pageStyles.easyGrid
+    if (cardCount <= 10) return pageStyles.mediumGrid
+    return pageStyles.hardGrid
+}
+
 export function GamePage(selectedLevel = 'easy') {
     const container = htmlToElement(`<div></div>`)
 
     const header = GameMenuHeader()
     container.appendChild(header)
 
+    const cardCount = levels[selectedLevel]
     const cardsContainer = htmlToElement(`
-    <div id="cards-container" class="${pageStyles.cardsGrid}"></div>
-  `)
+      <div id="cards-container" class="${pageStyles.cardsGrid} ${getGridClass(cardCount)}"></div>
+    `)
     container.appendChild(cardsContainer)
 
-    const cardCount = levels[selectedLevel]
     const pairCount = Math.ceil(cardCount / 2)
     const selectedImages = [...images].slice(0, pairCount)
     const cardsData = [...selectedImages, ...selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)

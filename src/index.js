@@ -4,6 +4,7 @@ import { Layout } from './components/Layout/Layout.js'
 import { GamePage, handleCardClick } from './components/GamePage/GamePage.js'
 import { startTimer, stopTimer, pauseTimer, resumeTimer } from './components/Timer/Timer.js'
 import { Button } from './components/Button/Button.js'
+import { GameRules } from './components/GameRules/GameRules.js'
 import './style.css'
 
 const root = document.getElementById('root')
@@ -48,7 +49,7 @@ export function setPage(page) {
         case 'settingsPage': {
             renderPageWithBack({
                 title: 'Инструкция',
-                nextTitle: 'Текст инструкции...',
+                nextTitle: GameRules(),
                 pageName: 'mainPage',
             })
             break

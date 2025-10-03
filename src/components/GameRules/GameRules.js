@@ -1,27 +1,43 @@
 import { htmlToElement } from '../../utils/htmlToELement.js'
+import * as styles from './GameRules.module.css'
+import { levels } from '../GamePage/GamePage.js'
+import { levelTimes } from '../../index.js'
+
+function RuleItem(text) {
+    return htmlToElement(`<li>${text}</li>`)
+}
+
+function DifficultyItem(label, count, time) {
+    return htmlToElement(`
+    <li>
+      <b>${label}</b> — ${count} карточек (${count / 2} пар), ⏱ ${time} секунд
+    </li>
+  `)
+}
 
 export function GameRules() {
-    const rulesHTML = `
-      <div>
-        <h2>Правила игры</h2>
-        <p>Игра тренирует память. Тебе нужно найти пары одинаковых карточек.</p>
-        <ul>
-          <li>В начале игры все карточки открываются на <b>5 секунд</b>, чтобы запомнить их.</li>
-          <li>После этого карточки переворачиваются рубашкой вверх.</li>
-          <li>Нужно кликать по карточкам и находить одинаковые пары.</li>
-          <li>Если карточки совпадают — они остаются открытыми.</li>
-          <li>Если карточки разные — они снова переворачиваются.</li>
-        </ul>
+    const container = htmlToElement(`<div class="${styles.container}"></div>`)
 
-        <h3>Сложности:</h3>
-        <ul>
-          <li><b>Лёгкий уровень</b> — 6 карточек (3 пары), время: 180 секунд.</li>
-          <li><b>Средний уровень</b> — 10 карточек (5 пар), время: 120 секунд.</li>
-          <li><b>Сложный уровень</b> — 14 карточек (7 пар), время: 60 секунд.</li>
-        </ul>
+    const rulesList = htmlToElement(`<ul class="${styles.list}"></ul>`)
+    rulesList.appendChild(RuleItem('🔍 Найдите все пары одинаковых карточек.'))
+    rulesList.appendChild(RuleItem('⏳ Внимание: на каждую сложность даётся ограниченное время.'))
+    rulesList.appendChild(
+        RuleItem(
+            '🃏 Перед началом игры все карточки показываются на 5 секунд — используйте это время, чтобы запомнить расположение.'
+        )
+    )
+    rulesList.appendChild(RuleItem('⚡ Игра заканчивается победой, если вы нашли все пары до окончания таймера.'))
+    rulesList.appendChild(RuleItem('💥 Если время истекло — игра завершается поражением.'))
+    container.appendChild(rulesList)
 
-        <p><b>Цель:</b> Найти все пары до того, как закончится время.</p>
-      </div>
-    `
-    return htmlToElement(rulesHTML)
+    const diffTitle = htmlToElement(`<h3 class="${styles.subtitle}">Уровни сложности:</h3>`)
+    container.appendChild(diffTitle)
+
+    const difficultyList = htmlToElement(`<ul class="${styles.list}"></ul>`)
+    difficultyList.appendChild(DifficultyItem('🥉 Лёгкий уровень', levels.easy, levelTimes.easy))
+    difficultyList.appendChild(DifficultyItem('🥈 Средний уровень', levels.medium, levelTimes.medium))
+    difficultyList.appendChild(DifficultyItem('🥇 Сложный уровень', levels.hard, levelTimes.hard))
+    container.appendChild(difficultyList)
+
+    return container
 }

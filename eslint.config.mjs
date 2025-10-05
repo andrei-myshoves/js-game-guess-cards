@@ -15,6 +15,7 @@ export default defineConfig([
             'prettier/prettier': 'error',
             'arrow-parens': ['error', 'as-needed'],
             'arrow-body-style': ['error', 'as-needed'],
+            curly: ['error', 'all'],
         },
         languageOptions: {
             globals: { ...globals.browser, ...globals.node },

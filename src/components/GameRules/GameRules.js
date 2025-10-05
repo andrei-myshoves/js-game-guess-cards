@@ -16,28 +16,41 @@ function DifficultyItem(label, count, time) {
 }
 
 export function GameRules() {
-    const container = htmlToElement(`<div class="${styles.container}"></div>`)
+    const container = htmlToElement(`
+    <div class="${styles.container}">
+      <ul id="rulesList" class="${styles.list}"></ul>
+      <h3 class="${styles.subtitle}">Уровни сложности:</h3>
+      <ul id="difficultyList" class="${styles.list}"></ul>
+    </div>
+  `)
 
-    const rulesList = htmlToElement(`<ul class="${styles.list}"></ul>`)
-    rulesList.appendChild(RuleItem('🔍 Найдите все пары одинаковых карточек.'))
-    rulesList.appendChild(RuleItem('⏳ Внимание: на каждую сложность даётся ограниченное время.'))
-    rulesList.appendChild(
-        RuleItem(
-            '🃏 Перед началом игры все карточки показываются на 5 секунд — используйте это время, чтобы запомнить расположение.'
-        )
-    )
-    rulesList.appendChild(RuleItem('⚡ Игра заканчивается победой, если вы нашли все пары до окончания таймера.'))
-    rulesList.appendChild(RuleItem('💥 Если время истекло — игра завершается поражением.'))
-    container.appendChild(rulesList)
+    container.getElementById = function (id) {
+        return this.querySelector(`#${id}`)
+    }
 
-    const diffTitle = htmlToElement(`<h3 class="${styles.subtitle}">Уровни сложности:</h3>`)
-    container.appendChild(diffTitle)
+    const rules = [
+        '🔍 Найдите все пары одинаковых карточек.',
+        '⏳ Внимание: на каждую сложность даётся ограниченное время.',
+        '🃏 Перед началом игры все карточки показываются на 5 секунд — используйте это время, чтобы запомнить расположение.',
+        '⚡ Игра заканчивается победой, если вы нашли все пары до окончания таймера.',
+        '💥 Если время истекло — игра завершается поражением.',
+    ]
 
-    const difficultyList = htmlToElement(`<ul class="${styles.list}"></ul>`)
-    difficultyList.appendChild(DifficultyItem('🥉 Лёгкий уровень', levels.easy, levelTimes.easy))
-    difficultyList.appendChild(DifficultyItem('🥈 Средний уровень', levels.medium, levelTimes.medium))
-    difficultyList.appendChild(DifficultyItem('🥇 Сложный уровень', levels.hard, levelTimes.hard))
-    container.appendChild(difficultyList)
+    const rulesList = container.getElementById('rulesList')
+    rules.forEach(rule => rulesList.appendChild(RuleItem(rule)))
+
+    const difficulties = [
+        { label: '🥉 Лёгкий уровень', key: 'easy' },
+        { label: '🥈 Средний уровень', key: 'medium' },
+        { label: '🥇 Сложный уровень', key: 'hard' },
+    ]
+
+    const difficultyList = container.getElementById('difficultyList')
+    difficulties.forEach(diff => {
+        const count = levels[diff.key]
+        const time = levelTimes[diff.key]
+        difficultyList.appendChild(DifficultyItem(diff.label, count, time))
+    })
 
     return container
 }

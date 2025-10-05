@@ -5,17 +5,23 @@ import markdown from '@eslint/markdown'
 import css from '@eslint/css'
 import prettier from 'eslint-plugin-prettier'
 import { defineConfig } from 'eslint/config'
+import * as addCurly from './eslint-rules/add-curly.js'
 
 export default defineConfig([
     {
         files: ['**/*.{js,mjs,cjs}'],
-        plugins: { js, prettier },
+        plugins: {
+            js,
+            prettier,
+            'add-curly': addCurly,
+        },
         extends: ['js/recommended'],
         rules: {
             'prettier/prettier': 'error',
             'arrow-parens': ['error', 'as-needed'],
             'arrow-body-style': ['error', 'as-needed'],
             curly: ['error', 'all'],
+            'add-curly/add-curly': 'error',
         },
         languageOptions: {
             globals: { ...globals.browser, ...globals.node },

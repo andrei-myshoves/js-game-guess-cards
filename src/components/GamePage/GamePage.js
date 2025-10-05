@@ -16,8 +16,12 @@ const images = [
 const levels = { easy: 6, medium: 10, hard: 14 }
 
 function getGridClass(cardCount) {
-    if (cardCount <= 6) return pageStyles.easyGrid
-    if (cardCount <= 10) return pageStyles.mediumGrid
+    if (cardCount <= 6) {
+        return pageStyles.easyGrid
+    }
+    if (cardCount <= 10) {
+        return pageStyles.mediumGrid
+    }
     return pageStyles.hardGrid
 }
 

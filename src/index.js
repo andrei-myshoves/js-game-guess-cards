@@ -9,7 +9,7 @@ import './style.css'
 
 const root = document.getElementById('root')
 
-const levelTimes = {
+export const levelTimes = {
     easy: 180,
     medium: 120,
     hard: 60,

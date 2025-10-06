@@ -13,7 +13,7 @@ const images = [
     '/img/Water.webp',
 ]
 
-const levels = { easy: 6, medium: 10, hard: 14 }
+export const levels = { easy: 6, medium: 10, hard: 14 }
 
 function getGridClass(cardCount) {
     if (cardCount <= 6) return pageStyles.easyGrid

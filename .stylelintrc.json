@@ -1,8 +1,15 @@
 {
   "extends": [
-    "stylelint-config-standard"
+    "stylelint-config-standard-scss"
   ],
   "rules": {
-    "selector-class-pattern": null
-  }
+    "string-quotes": "single",               
+    "declaration-block-trailing-semicolon": null, 
+    "indentation": null,                       
+    "selector-class-pattern": "^[a-z][a-zA-Z0-9]+$", 
+    "no-empty-source": true,
+    "max-empty-lines": 1,
+    "color-hex-case": "lower"
+  },
+  "ignoreFiles": ["**/node_modules/**"]
 }

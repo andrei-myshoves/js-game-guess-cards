@@ -8,7 +8,8 @@
         "start": "webpack serve --env mode=development",
         "format": "prettier --write \"src/**/*.{js,css,html,json,md}\"",
         "lint": "eslint \"src/**/*.{js,mjs,cjs}\"",
-        "lint:fix": "eslint \"src/**/*.{js,mjs,cjs}\" --fix"
+        "lint:fix": "eslint \"src/**/*.{js,mjs,cjs}\" --fix",
+        "lint:css": "stylelint \"**/*.css\" --fix"
     },
     "keywords": [],
     "author": "",
@@ -31,6 +32,9 @@
         "mini-css-extract-plugin": "^2.9.4",
         "prettier": "^3.6.2",
         "style-loader": "^4.0.0",
+        "stylelint": "^16.25.0",
+        "stylelint-config-prettier-scss": "^1.0.0",
+        "stylelint-config-standard-scss": "^16.0.0",
         "webpack": "^5.101.3",
         "webpack-cli": "^5.1.4",
         "webpack-dev-server": "^4.15.1"
@@ -41,6 +45,7 @@
             "prettier --write"
         ],
         "*.{css,md}": [
+            "stylelint --fix",
             "prettier --write"
         ],
         "package.json": [

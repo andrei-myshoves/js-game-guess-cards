@@ -1,8 +1,20 @@
 {
-  "extends": ["stylelint-config-standard-scss"],
-  "rules": {
-    "selector-class-pattern": "^[a-z][a-zA-Z0-9]+$",  
-    "no-empty-source": true
-  },
-  "ignoreFiles": ["**/node_modules/**"]
+    "extends": ["stylelint-config-standard"],
+    "rules": {
+        "selector-class-pattern": "^[a-z][a-zA-Z0-9]+$",
+        "no-empty-source": true,
+        "property-no-unknown": [
+            true,
+            {
+                "ignoreProperties": [
+                    "-ms-text-size-adjust",
+                    "-moz-text-size-adjust",
+                    "-webkit-text-size-adjust",
+                    "-moz-box-sizing",
+                    "-webkit-box-sizing"
+                ]
+            }
+        ]
+    },
+    "ignoreFiles": ["**/node_modules/**"]
 }

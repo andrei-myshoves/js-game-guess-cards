@@ -7,8 +7,8 @@
 *,
 *::before,
 *::after {
-    box-sizing: border-box;
-    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
 
@@ -27,11 +27,12 @@ html,
 body {
     height: 100%;
     width: 100%;
+    font-size: 100%;
     line-height: 1;
     font-size: 14px;
-    text-size-adjust: 100%;
-    text-size-adjust: 100%;
-    text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
 }
 
 input,
@@ -83,7 +84,7 @@ h6 {
 /* Styles to common body */
 .body {
     position: relative;
-    font-family: Montserrat, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 18px;
     min-height: 100svh;
 }

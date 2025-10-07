@@ -3,6 +3,7 @@
   "rules": {
     "selector-class-pattern": "^[a-z][a-zA-Z0-9]+$",
     "no-empty-source": true,
+
     "property-no-unknown": [
       true,
       {
@@ -11,17 +12,20 @@
           "-ms-text-size-adjust",
           "-moz-text-size-adjust",
           "-webkit-text-size-adjust",
-          "font-size"
+          "font-size",
+          "-moz-box-sizing",
+          "-webkit-box-sizing"
         ]
       }
     ],
-    "declaration-block-no-duplicate-properties": [
-      true,
-      {
-        "ignore": ["consecutive-duplicates-with-different-values"]
-      }
-    ],
-    "declaration-no-important": null
+
+    "property-no-vendor-prefix": null,
+
+    "declaration-block-no-duplicate-properties": null,
+
+    "declaration-no-important": null,
+
+    "font-family-name-quotes": null
   },
   "ignoreFiles": ["**/node_modules/**"]
 }

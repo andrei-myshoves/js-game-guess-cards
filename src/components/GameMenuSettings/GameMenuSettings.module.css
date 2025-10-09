@@ -35,10 +35,12 @@
         background-color: var(--dificult-setting-accent-hover);
         color: var(--foreground-accent-hover);
     }
+
     .buttonMedium:hover {
         background-color: var(--dificult-setting-accent-hover);
         color: var(--foreground-accent-hover);
     }
+
     .buttonHard:hover {
         background-color: var(--dificult-setting-accent-hover);
         color: var(--foreground-accent-hover);

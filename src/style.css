@@ -3,6 +3,7 @@
     margin: 0;
     border: 0;
 }
+
 *,
 *::before,
 *::after {
@@ -10,6 +11,7 @@
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
+
 :focus-visible {
     box-shadow: 0 0 0 2px var(--background-accent);
 }
@@ -42,23 +44,29 @@ textarea {
 input::-ms-clear {
     display: none;
 }
+
 button {
     cursor: pointer;
 }
+
 button::-moz-focus-inner {
     padding: 0;
     border: 0;
 }
+
 a,
 a:visited {
     text-decoration: none;
 }
+
 a:hover {
     text-decoration: none;
 }
+
 ul li {
     list-style: none;
 }
+
 img {
     vertical-align: top;
 }
@@ -84,12 +92,9 @@ h6 {
 :root {
     --background-default: #f0f0f0;
     --foreground-default: #333;
-
     --background-accent: #2196f3;
     --foreground-accent: #fff;
-
     --background-accent-hover: #4caf50;
     --foreground-accent-hover: #cfe907;
-
     --dificult-setting-accent-hover: #f9f9f9;
 }

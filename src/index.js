@@ -5,6 +5,7 @@ import { GamePage, handleCardClick } from './components/GamePage/GamePage.js'
 import { startTimer, stopTimer, pauseTimer, resumeTimer } from './components/Timer/Timer.js'
 import { Button } from './components/Button/Button.js'
 import { GameRules } from './components/GameRules/GameRules.js'
+import { HistoryGame } from './components/HistoryGame/HistoryGame.js'
 import './style.css'
 
 const root = document.getElementById('root')
@@ -23,12 +24,8 @@ export function setPage(page) {
             break
         }
         case 'historyPage': {
-            renderPageWithBack({
-                title: 'Здесь скоро будет история',
-                nextTitle: '',
-                isSettingsMenu: false,
-                pageName: 'mainPage',
-            })
+            root.innerHTML = ''
+            root.appendChild(HistoryGame())
             break
         }
         case 'gamePage': {

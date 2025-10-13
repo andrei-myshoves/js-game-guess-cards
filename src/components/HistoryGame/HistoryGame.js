@@ -4,27 +4,6 @@ import { htmlToElement } from '../../utils/htmlToELement.js'
 import * as styles from './HistoryGame.module.css'
 import { setPage } from '../../index.js'
 
-const mockHistory = [
-    {
-        startedAt: '2025-10-10T14:12:00',
-        result: 'win',
-        difficulty: 'easy',
-        duration: 82,
-    },
-    {
-        startedAt: '2025-10-09T19:47:00',
-        result: 'lose',
-        difficulty: 'medium',
-        duration: 114,
-    },
-    {
-        startedAt: '2025-10-09T13:33:00',
-        result: 'win',
-        difficulty: 'hard',
-        duration: 61,
-    },
-]
-
 function formatDuration(seconds) {
     if (!seconds) {
         return '-'
@@ -34,6 +13,7 @@ function formatDuration(seconds) {
     return `${mins} мин ${secs} сек`
 }
 
+//  Формат сложности
 function formatDifficulty(level) {
     switch (level) {
         case 'easy':
@@ -46,65 +26,97 @@ function formatDifficulty(level) {
             return '-'
     }
 }
+// eslint-disable-next-line no-unused-vars
+function getHistory() {
+    const data = localStorage.getItem('gameHistory')
+    return data ? JSON.parse(data) : []
+}
+
+// eslint-disable-next-line no-unused-vars
+function saveHistory(history) {
+    localStorage.setItem('gameHistory', JSON.stringify(history))
+}
 
 export function HistoryGame() {
-    const rows = mockHistory
-        .map(
-            item => `
-        <tr>
-          <td>${new Date(item.startedAt).toLocaleString()}</td>
-          <td class="${item.result === 'win' ? styles.resultWin : styles.resultLose}">
-            ${item.result === 'win' ? 'Победа' : 'Поражение'}
-          </td>
-          <td>${formatDifficulty(item.difficulty)}</td>
-          <td>${formatDuration(item.duration)}</td>
-        </tr>`
-        )
-        .join('')
+    const history = JSON.parse(localStorage.getItem('gameHistory')) || []
 
-    const content = htmlToElement(`
-    <div class="${styles.historyContainer}">
-      <div id="headerBtnsContainer" class="${styles.headerButtons}"></div>
+    let contentHTML = ''
 
-      <table class="${styles.historyTable}">
-        <thead>
+    if (history.length === 0) {
+        contentHTML = `
+      <div class="${styles['history-container']}">
+        <div id="headerBtnsContainer" class="${styles['header-buttons']}"></div>
+        <p class="${styles['history-empty-text']}">История игр пуста. Сыграйте первую игру!</p>
+        <div id="footerBtnsContainer" class="${styles['footer-buttons']}"></div>
+      </div>
+    `
+    } else {
+        const rows = history
+            .map(
+                item => `
           <tr>
-            <th>Дата и время</th>
-            <th>Результат</th>
-            <th>Сложность</th>
-            <th>Время</th>
+            <td>${new Date(item.startedAt).toLocaleString()}</td>
+            <td class="${
+                item.result === 'win' ? styles['result-win'] : styles['result-lose']
+            }">${item.result === 'win' ? 'Победа' : 'Поражение'}</td>
+            <td>${formatDifficulty(item.difficulty)}</td>
+            <td>${formatDuration(item.duration)}</td>
           </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
+        `
+            )
+            .join('')
 
-      <div id="footerBtnsContainer" class="${styles.footerButtons}"></div>
-    </div>
-  `)
+        contentHTML = `
+      <div class="${styles['history-container']}">
+        <div id="headerBtnsContainer" class="${styles['header-buttons']}"></div>
+        <table class="${styles['history-table']}">
+          <thead>
+            <tr>
+              <th>Дата и время</th>
+              <th>Результат</th>
+              <th>Сложность</th>
+              <th>Время</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div id="footerBtnsContainer" class="${styles['footer-buttons']}"></div>
+      </div>
+    `
+    }
+
+    const content = htmlToElement(contentHTML)
 
     content.getElementById = function (id) {
         return this.querySelector(`#${id}`)
     }
 
+    // Создаём кнопки
     const repeatBtn = Button({
         id: 'repeatGameBtn',
         text: 'Повторить игру',
-        extraClass: styles.btnRepeat,
+        extraClass: styles['btn-repeat'],
     })
 
     const clearBtn = Button({
         id: 'clearHistoryBtn',
         text: 'Очистить историю',
-        extraClass: styles.btnClear,
+        extraClass: styles['btn-clear'],
+    })
+
+    const startBtn = Button({
+        id: 'startGameBtn',
+        text: 'Начать первую игру',
+        extraClass: styles['btn-start'],
     })
 
     const headerContainer = content.getElementById('headerBtnsContainer')
     const footerContainer = content.getElementById('footerBtnsContainer')
 
-    if (headerContainer) {
+    if (history.length === 0) {
+        footerContainer.appendChild(startBtn)
+    } else {
         headerContainer.appendChild(repeatBtn)
-    }
-    if (footerContainer) {
         footerContainer.appendChild(clearBtn)
     }
 
@@ -114,20 +126,38 @@ export function HistoryGame() {
         showBack: true,
     })
 
+    // Навешиваем обработчики
     const backBtn = layout.getElementById('backBtn')
-    const repeatGameBtn = layout.getElementById('repeatGameBtn')
-    const clearHistoryBtn = layout.getElementById('clearHistoryBtn')
+    const repeatBtnEl = layout.getElementById('repeatGameBtn')
+    const clearBtnEl = layout.getElementById('clearHistoryBtn')
+    const startBtnEl = layout.getElementById('startGameBtn')
 
     if (backBtn) {
         backBtn.addEventListener('click', () => setPage('mainPage'))
     }
 
-    if (repeatGameBtn) {
-        repeatGameBtn.addEventListener('click', () => alert('Повторить последнюю игру'))
+    if (repeatBtnEl) {
+        repeatBtnEl.addEventListener('click', () => {
+            const lastGame = history[history.length - 1]
+            if (lastGame) {
+                alert(`Повторяем последнюю игру (${formatDifficulty(lastGame.difficulty)})`)
+                setPage('gamePage')
+            }
+        })
     }
 
-    if (clearHistoryBtn) {
-        clearHistoryBtn.addEventListener('click', () => alert('Очистка истории (пока тест)'))
+    if (clearBtnEl) {
+        clearBtnEl.addEventListener('click', () => {
+            localStorage.removeItem('gameHistory')
+            alert('История игр очищена')
+            setPage('historyGame')
+        })
+    }
+
+    if (startBtnEl) {
+        startBtnEl.addEventListener('click', () => {
+            setPage('gamePage')
+        })
     }
 
     return layout

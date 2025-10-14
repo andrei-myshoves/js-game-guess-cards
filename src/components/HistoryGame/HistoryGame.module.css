@@ -30,16 +30,18 @@
     border: 1px solid #e5e7eb;
 }
 
-.historyTable th,
-.historyTable td {
+.historyTableCell {
     padding: 12px 16px;
     text-align: center;
     border-bottom: 1px solid #e5e7eb;
 }
 
-.historyTable th {
+.historyTableHeader {
     background: #f3f4f6;
     font-weight: 600;
+    padding: 12px 16px;
+    text-align: center;
+    border-bottom: 1px solid #e5e7eb;
 }
 
 .resultWin {

@@ -61,7 +61,7 @@
 }
 
 .btnClear {
-    background-color: #ef4444;
+    background-color: var(--button-clear-bg);
     padding: 10px 20px;
     transition: 0.2s;
 }

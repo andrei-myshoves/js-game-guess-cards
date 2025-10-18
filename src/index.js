@@ -123,10 +123,27 @@ function renderPageWithBack({
 
 function renderGamePage(selectedLevel) {
     const flippedCards = []
-    const gameState = { matchedCount: 0, locked: false }
 
-    const { container, cardsData, cardCount } = GamePage(selectedLevel)
+    // Передаём коллбэки победы и поражения в GamePage
+    const gamePageInstance = GamePage(
+        selectedLevel,
+        () => {
+            // onWinCallback
+            stopTimer()
+            alert('Вы победили!')
+            setPage('mainPage')
+        },
+        () => {
+            // onLoseCallback
+            stopTimer()
+            alert('Вы проиграли!')
+            setPage('mainPage')
+        }
+    )
 
+    const { container, cardsData, cardCount, gameState } = gamePageInstance
+
+    // Отрисовка Layout
     const layout = Layout({
         title: 'Игра',
         children: container,
@@ -144,6 +161,7 @@ function renderGamePage(selectedLevel) {
         childrenContainer.appendChild(endBtn)
     }
 
+    // Счётчики угаданных и оставшихся пар
     const guessedEl = document.getElementById('guessedCount')
     const remainingEl = document.getElementById('remainingCount')
     if (guessedEl) {
@@ -186,36 +204,34 @@ function renderGamePage(selectedLevel) {
             })
 
             startTimer(levelTimes[selectedLevel])
-
-            cardsData.forEach((image, index) => {
-                const cardId = `card-${index}`
-                const cardElement = document.getElementById(cardId)
-                if (!cardElement) {
-                    return
-                }
-                cardElement.addEventListener('click', () =>
-                    handleCardClick({
-                        id: cardId,
-                        image,
-                        flippedCards,
-                        gameState,
-                        cardCount,
-                        onWin: () => {
-                            stopTimer()
-                            alert('Вы победили!')
-                            setPage('mainPage')
-                        },
-                    })
-                )
-            })
         }
     }, 1000)
+
+    cardsData.forEach((image, index) => {
+        const cardId = `card-${index}`
+        const cardElement = document.getElementById(cardId)
+        if (!cardElement) {
+            return
+        }
+        cardElement.addEventListener('click', () =>
+            handleCardClick({
+                id: cardId,
+                image,
+                flippedCards,
+                gameState,
+                cardCount,
+                selectedLevel,
+                onWin: () => gamePageInstance?.onWinCallback?.(),
+            })
+        )
+    })
 
     const endGame = () => {
         stopTimer()
         clearInterval(previewInterval)
-        alert('Вы проиграли!')
-        setPage('mainPage')
+        if (gamePageInstance?.loseGame) {
+            gamePageInstance.loseGame()
+        }
     }
 
     if (endBtn) {

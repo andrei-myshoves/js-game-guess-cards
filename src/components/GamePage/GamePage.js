@@ -25,25 +25,77 @@ function getGridClass(cardCount) {
     return pageStyles.hardGrid
 }
 
-export function GamePage(selectedLevel = 'easy') {
-    const container = htmlToElement(`<div></div>`)
+function saveResultToHistory(result, difficulty, duration) {
+    try {
+        const history = JSON.parse(localStorage.getItem('gameHistory')) || []
 
+        const newEntry = {
+            startedAt: new Date().toISOString(),
+            result,
+            difficulty,
+            duration,
+        }
+
+        history.push(newEntry)
+        localStorage.setItem('gameHistory', JSON.stringify(history))
+    } catch (error) {
+        console.error('Ошибка при сохранении истории игры:', error)
+    }
+}
+
+export function GamePage(selectedLevel = 'easy', onWinCallback, onLoseCallback) {
+    const container = htmlToElement(`<div></div>`)
     const header = GameMenuHeader()
     container.appendChild(header)
 
     const cardCount = levels[selectedLevel]
     const cardsContainer = htmlToElement(`
-      <div id="cards-container" class="${pageStyles.cardsGrid} ${getGridClass(cardCount)}"></div>
-    `)
+    <div id="cards-container" class="${pageStyles.cardsGrid} ${getGridClass(cardCount)}"></div>
+  `)
     container.appendChild(cardsContainer)
 
     const pairCount = Math.ceil(cardCount / 2)
     const selectedImages = [...images].slice(0, pairCount)
     const cardsData = [...selectedImages, ...selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)
 
+    const gameState = {
+        locked: false,
+        matchedCount: 0,
+        startTime: Date.now(),
+        timerId: null,
+    }
+
+    const flippedCards = []
+    const AUTO_LOSE_MS = 120000
+    gameState.timerId = setTimeout(() => {
+        const totalTime = Math.floor((Date.now() - gameState.startTime) / 1000)
+        saveResultToHistory('lose', selectedLevel, totalTime)
+        if (typeof onLoseCallback === 'function') {
+            onLoseCallback()
+        }
+    }, AUTO_LOSE_MS)
+
     cardsData.forEach((image, index) => {
         const cardId = `card-${index}`
         const card = Card(cardId, image)
+        card.addEventListener('click', () => {
+            handleCardClick({
+                id: cardId,
+                image,
+                flippedCards,
+                gameState,
+                cardCount,
+                selectedLevel,
+                onWin: () => {
+                    clearTimeout(gameState.timerId)
+                    const totalTime = Math.floor((Date.now() - gameState.startTime) / 1000)
+                    saveResultToHistory('win', selectedLevel, totalTime)
+                    if (typeof onWinCallback === 'function') {
+                        onWinCallback()
+                    }
+                },
+            })
+        })
         cardsContainer.appendChild(card)
     })
 
@@ -56,7 +108,26 @@ export function GamePage(selectedLevel = 'easy') {
         remainingEl.textContent = String(pairCount)
     }
 
-    return { container, selectedImages, cardsData, cardCount }
+    function loseGameManual() {
+        if (gameState.timerId) {
+            clearTimeout(gameState.timerId)
+            gameState.timerId = null
+        }
+        const totalTime = Math.floor((Date.now() - gameState.startTime) / 1000)
+        saveResultToHistory('lose', selectedLevel, totalTime)
+        if (typeof onLoseCallback === 'function') {
+            onLoseCallback()
+        }
+    }
+
+    return {
+        container,
+        selectedImages,
+        cardsData,
+        cardCount,
+        gameState,
+        loseGame: loseGameManual,
+    }
 }
 
 export function handleCardClick({ id, image, flippedCards, gameState, cardCount, onWin }) {
@@ -73,7 +144,6 @@ export function handleCardClick({ id, image, flippedCards, gameState, cardCount,
 
     cardFront.style.display = 'block'
     cardBack.style.display = 'none'
-
     flippedCards.push({ cardId: id, image })
 
     if (flippedCards.length === 2) {

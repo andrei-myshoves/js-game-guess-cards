@@ -2,6 +2,7 @@ import { Card } from '../Card/Card.js'
 import { htmlToElement } from '../../utils/htmlToELement.js'
 import * as pageStyles from './GamePage.module.css'
 import { GameMenuHeader } from '../GameMenuHeader/GameMenuHeader.js'
+import { levelTimes } from '../../index.js'
 
 const images = [
     '/img/Air.webp',
@@ -28,14 +29,12 @@ function getGridClass(cardCount) {
 function saveResultToHistory(result, difficulty, duration) {
     try {
         const history = JSON.parse(localStorage.getItem('gameHistory')) || []
-
         const newEntry = {
             startedAt: new Date().toISOString(),
             result,
             difficulty,
             duration,
         }
-
         history.push(newEntry)
         localStorage.setItem('gameHistory', JSON.stringify(history))
     } catch (error) {
@@ -50,8 +49,8 @@ export function GamePage(selectedLevel = 'easy', onWinCallback, onLoseCallback) 
 
     const cardCount = levels[selectedLevel]
     const cardsContainer = htmlToElement(`
-    <div id="cards-container" class="${pageStyles.cardsGrid} ${getGridClass(cardCount)}"></div>
-  `)
+        <div id="cards-container" class="${pageStyles.cardsGrid} ${getGridClass(cardCount)}"></div>
+    `)
     container.appendChild(cardsContainer)
 
     const pairCount = Math.ceil(cardCount / 2)
@@ -65,15 +64,16 @@ export function GamePage(selectedLevel = 'easy', onWinCallback, onLoseCallback) 
         timerId: null,
     }
 
-    const flippedCards = []
-    const AUTO_LOSE_MS = 120000
+    const levelDuration = levelTimes[selectedLevel] * 1000
     gameState.timerId = setTimeout(() => {
         const totalTime = Math.floor((Date.now() - gameState.startTime) / 1000)
         saveResultToHistory('lose', selectedLevel, totalTime)
         if (typeof onLoseCallback === 'function') {
             onLoseCallback()
         }
-    }, AUTO_LOSE_MS)
+    }, levelDuration)
+
+    const flippedCards = []
 
     cardsData.forEach((image, index) => {
         const cardId = `card-${index}`
@@ -98,15 +98,6 @@ export function GamePage(selectedLevel = 'easy', onWinCallback, onLoseCallback) 
         })
         cardsContainer.appendChild(card)
     })
-
-    const guessedEl = document.getElementById('guessedCount')
-    const remainingEl = document.getElementById('remainingCount')
-    if (guessedEl) {
-        guessedEl.textContent = '0'
-    }
-    if (remainingEl) {
-        remainingEl.textContent = String(pairCount)
-    }
 
     function loseGameManual() {
         if (gameState.timerId) {

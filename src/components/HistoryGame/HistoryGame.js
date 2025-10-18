@@ -90,7 +90,7 @@ export function HistoryGame({ onStartGame } = {}) {
 
     layout.querySelector('#clearHistoryBtn')?.addEventListener('click', () => {
         localStorage.removeItem('gameHistory')
-        setPage('historyGame')
+        setPage('historyPage')
     })
 
     layout.querySelector('#startGameBtn')?.addEventListener('click', () => {

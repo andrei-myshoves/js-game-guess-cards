@@ -21,35 +21,35 @@ export function HistoryGame({ onStartGame } = {}) {
         const rows = history
             .map(
                 item => `
-          <tr>
-            <td>${new Date(item.startedAt).toLocaleString()}</td>
-            <td class="${
-                item.result === 'win' ? styles.resultWin : styles.resultLose
-            }">${item.result === 'win' ? 'Победа' : 'Поражение'}</td>
-            <td>${item.difficulty}</td>
-            <td>${Math.floor(item.duration / 60)} мин ${item.duration % 60} сек</td>
-          </tr>
+            <tr>
+                <td class="${styles.historyTableCell}">${new Date(item.startedAt).toLocaleString()}</td>
+                <td class="${styles.historyTableCell} ${item.result === 'win' ? styles.resultWin : styles.resultLose}">
+                    ${item.result === 'win' ? 'Победа' : 'Поражение'}
+                </td>
+                <td class="${styles.historyTableCell}">${item.difficulty}</td>
+                <td class="${styles.historyTableCell}">${Math.floor(item.duration / 60)} мин ${item.duration % 60} сек</td>
+            </tr>
         `
             )
             .join('')
 
         contentHTML = `
-      <div class="${styles.historyContainer}">
-        <div id="headerBtnsContainer" class="${styles.headerButtons}"></div>
-        <table class="${styles.historyTable}">
-          <thead>
-            <tr>
-              <th>Дата и время</th>
-              <th>Результат</th>
-              <th>Сложность</th>
-              <th>Время</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-        <div id="footerBtnsContainer" class="${styles.footerButtons}"></div>
-      </div>
-    `
+        <div class="${styles.historyContainer}">
+            <div id="headerBtnsContainer" class="${styles.headerButtons}"></div>
+            <table class="${styles.historyTable}">
+                <thead>
+                    <tr>
+                        <th class="${styles.historyTableHeader}">Дата и время</th>
+                        <th class="${styles.historyTableHeader}">Результат</th>
+                        <th class="${styles.historyTableHeader}">Сложность</th>
+                        <th class="${styles.historyTableHeader}">Время</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+            <div id="footerBtnsContainer" class="${styles.footerButtons}"></div>
+        </div>
+        `
     }
 
     const content = htmlToElement(contentHTML)

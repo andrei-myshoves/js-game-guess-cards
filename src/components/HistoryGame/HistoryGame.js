@@ -4,6 +4,12 @@ import { htmlToElement } from '../../utils/htmlToELement.js'
 import * as styles from './HistoryGame.module.css'
 import { setPage } from '../../index.js'
 
+const difficultyLabels = {
+    easy: 'Лёгкий',
+    medium: 'Средний',
+    hard: 'Тяжёлый',
+}
+
 export function HistoryGame({ onStartGame } = {}) {
     const history = JSON.parse(localStorage.getItem('gameHistory')) || []
 
@@ -21,30 +27,29 @@ export function HistoryGame({ onStartGame } = {}) {
     } else {
         const table = htmlToElement(`<table class="${styles.historyTable}"></table>`)
         const thead = htmlToElement(`
-            <thead>
-                <tr>
-                    <th class="${styles.historyTableHeader}">Дата и время</th>
-                    <th class="${styles.historyTableHeader}">Результат</th>
-                    <th class="${styles.historyTableHeader}">Сложность</th>
-                    <th class="${styles.historyTableHeader}">Время</th>
-                </tr>
-            </thead>
-        `)
+        <thead>
+            <tr>
+                <th class="${styles.historyTableHeader}">Дата и время</th>
+                <th class="${styles.historyTableHeader}">Результат</th>
+                <th class="${styles.historyTableHeader}">Сложность</th>
+                <th class="${styles.historyTableHeader}">Время</th>
+            </tr>
+        </thead>
+    `)
         const tbody = htmlToElement('<tbody></tbody>')
 
         history.forEach(item => {
+            const difficultyText = difficultyLabels[item.difficulty] || item.difficulty
             const row = htmlToElement(`
-                <tr>
-                    <td class="${styles.historyTableCell}">${new Date(item.startedAt).toLocaleString()}</td>
-                    <td class="${styles.historyTableCell} ${
-                        item.result === 'win' ? styles.resultWin : styles.resultLose
-                    }">
-                        ${item.result === 'win' ? 'Победа' : 'Поражение'}
-                    </td>
-                    <td class="${styles.historyTableCell}">${item.difficulty}</td>
-                    <td class="${styles.historyTableCell}">${Math.floor(item.duration / 60)} мин ${item.duration % 60} сек</td>
-                </tr>
-            `)
+            <tr>
+                <td class="${styles.historyTableCell}">${new Date(item.startedAt).toLocaleString()}</td>
+                <td class="${styles.historyTableCell} ${item.result === 'win' ? styles.resultWin : styles.resultLose}">
+                    ${item.result === 'win' ? 'Победа' : 'Поражение'}
+                </td>
+                <td class="${styles.historyTableCell}">${difficultyText}</td>
+                <td class="${styles.historyTableCell}">${Math.floor(item.duration / 60)} мин ${item.duration % 60} сек</td>
+            </tr>
+        `)
             tbody.appendChild(row)
         })
 

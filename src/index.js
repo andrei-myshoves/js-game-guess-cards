@@ -7,6 +7,7 @@ import { Button } from './components/Button/Button.js'
 import { GameRules } from './components/GameRules/GameRules.js'
 import { HistoryGame } from './components/HistoryGame/HistoryGame.js'
 import './style.css'
+import { selectedLevelLSKey, currentPageLSKey } from './constants.js'
 
 const root = document.getElementById('root')
 
@@ -24,15 +25,14 @@ export function setPage(page) {
             break
         }
         case 'historyPage': {
-            root.innerHTML = ''
             root.appendChild(HistoryGame())
             break
         }
         case 'gamePage': {
-            const level = localStorage.getItem('selectedLevel')
+            const level = localStorage.getItem(selectedLevelLSKey)
             if (level) {
                 renderGamePage(level)
-                localStorage.removeItem('selectedLevel')
+                localStorage.removeItem(selectedLevelLSKey)
             } else {
                 renderPageWithBack({
                     title: 'Выберите сложность',
@@ -57,7 +57,8 @@ export function setPage(page) {
             break
         }
     }
-    localStorage.setItem('currentPage', page)
+
+    localStorage.setItem(currentPageLSKey, page)
 }
 
 function renderMainMenu() {
@@ -102,19 +103,19 @@ function renderPageWithBack({
 
         if (easyBtn) {
             easyBtn.addEventListener('click', () => {
-                localStorage.setItem('selectedLevel', 'easy')
+                localStorage.setItem(selectedLevelLSKey, 'easy')
                 setPage('gamePage')
             })
         }
         if (mediumBtn) {
             mediumBtn.addEventListener('click', () => {
-                localStorage.setItem('selectedLevel', 'medium')
+                localStorage.setItem(selectedLevelLSKey, 'medium')
                 setPage('gamePage')
             })
         }
         if (hardBtn) {
             hardBtn.addEventListener('click', () => {
-                localStorage.setItem('selectedLevel', 'hard')
+                localStorage.setItem(selectedLevelLSKey, 'hard')
                 setPage('gamePage')
             })
         }
@@ -124,26 +125,26 @@ function renderPageWithBack({
 function renderGamePage(selectedLevel) {
     const flippedCards = []
 
-    // Передаём коллбэки победы и поражения в GamePage
-    const gamePageInstance = GamePage(
+    const onWinCallback = () => {
+        stopTimer()
+        alert('Вы победили!')
+        setPage('mainPage')
+    }
+
+    const onLoseCallback = () => {
+        stopTimer()
+        alert('Вы проиграли!')
+        setPage('mainPage')
+    }
+
+    const gamePageInstance = GamePage({
         selectedLevel,
-        () => {
-            // onWinCallback
-            stopTimer()
-            alert('Вы победили!')
-            setPage('mainPage')
-        },
-        () => {
-            // onLoseCallback
-            stopTimer()
-            alert('Вы проиграли!')
-            setPage('mainPage')
-        }
-    )
+        onWinCallback,
+        onLoseCallback,
+    })
 
     const { container, cardsData, cardCount, gameState } = gamePageInstance
 
-    // Отрисовка Layout
     const layout = Layout({
         title: 'Игра',
         children: container,
@@ -154,14 +155,12 @@ function renderGamePage(selectedLevel) {
     const endBtn = Button({
         id: 'endGameBtn',
         text: 'Завершить игру',
-        extraClass: '',
     })
     const childrenContainer = document.getElementById('childrenContainer')
     if (childrenContainer) {
         childrenContainer.appendChild(endBtn)
     }
 
-    // Счётчики угаданных и оставшихся пар
     const guessedEl = document.getElementById('guessedCount')
     const remainingEl = document.getElementById('remainingCount')
     if (guessedEl) {
@@ -221,7 +220,7 @@ function renderGamePage(selectedLevel) {
                 gameState,
                 cardCount,
                 selectedLevel,
-                onWin: () => gamePageInstance?.onWinCallback?.(),
+                onWin: onWinCallback,
             })
         )
     })
@@ -234,13 +233,8 @@ function renderGamePage(selectedLevel) {
         }
     }
 
-    if (endBtn) {
-        endBtn.addEventListener('click', endGame)
-    }
-    const backBtn = document.getElementById('backBtn')
-    if (backBtn) {
-        backBtn.addEventListener('click', endGame)
-    }
+    document.getElementById('endGameBtn')?.addEventListener('click', endGame)
+    document.getElementById('backBtn')?.addEventListener('click', endGame)
 }
 
 document.addEventListener('visibilitychange', () => {
@@ -251,5 +245,5 @@ document.addEventListener('visibilitychange', () => {
     }
 })
 
-const savedPage = localStorage.getItem('currentPage') || 'mainPage'
+const savedPage = localStorage.getItem(currentPageLSKey) || 'mainPage'
 setPage(savedPage)

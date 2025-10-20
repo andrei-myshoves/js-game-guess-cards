@@ -3,6 +3,7 @@ import { Button } from '../Button/Button.js'
 import { htmlToElement } from '../../utils/htmlToELement.js'
 import * as styles from './HistoryGame.module.css'
 import { setPage } from '../../index.js'
+import { gameHistoryLSKey } from '../../constants.js'
 
 const difficultyLabels = {
     easy: 'Лёгкий',
@@ -10,8 +11,26 @@ const difficultyLabels = {
     hard: 'Тяжёлый',
 }
 
+const repeatBtn = Button({
+    id: 'repeatGameBtn',
+    text: 'Повторить игру',
+    extraClass: styles.btnRepeat,
+})
+
+const clearBtn = Button({
+    id: 'clearHistoryBtn',
+    text: 'Очистить историю',
+    extraClass: styles.btnClear,
+})
+
+const startBtn = Button({
+    id: 'startGameBtn',
+    text: 'Начать первую игру',
+    extraClass: styles.btnStart,
+})
+
 export function HistoryGame({ onStartGame } = {}) {
-    const history = JSON.parse(localStorage.getItem('gameHistory')) || []
+    const history = JSON.parse(localStorage.getItem(gameHistoryLSKey)) || []
 
     const content = htmlToElement(`<div class="${styles.historyContainer}"></div>`)
     const headerContainer = htmlToElement(`<div id="headerBtnsContainer" class="${styles.headerButtons}"></div>`)
@@ -27,29 +46,33 @@ export function HistoryGame({ onStartGame } = {}) {
     } else {
         const table = htmlToElement(`<table class="${styles.historyTable}"></table>`)
         const thead = htmlToElement(`
-        <thead>
-            <tr>
-                <th class="${styles.historyTableHeader}">Дата и время</th>
-                <th class="${styles.historyTableHeader}">Результат</th>
-                <th class="${styles.historyTableHeader}">Сложность</th>
-                <th class="${styles.historyTableHeader}">Время</th>
-            </tr>
-        </thead>
-    `)
+            <thead>
+                <tr>
+                    <th class="${styles.historyTableHeader}">Дата и время</th>
+                    <th class="${styles.historyTableHeader}">Результат</th>
+                    <th class="${styles.historyTableHeader}">Сложность</th>
+                    <th class="${styles.historyTableHeader}">Время</th>
+                </tr>
+            </thead>
+        `)
         const tbody = htmlToElement('<tbody></tbody>')
 
         history.forEach(item => {
             const difficultyText = difficultyLabels[item.difficulty] || item.difficulty
             const row = htmlToElement(`
-            <tr>
-                <td class="${styles.historyTableCell}">${new Date(item.startedAt).toLocaleString()}</td>
-                <td class="${styles.historyTableCell} ${item.result === 'win' ? styles.resultWin : styles.resultLose}">
-                    ${item.result === 'win' ? 'Победа' : 'Поражение'}
-                </td>
-                <td class="${styles.historyTableCell}">${difficultyText}</td>
-                <td class="${styles.historyTableCell}">${Math.floor(item.duration / 60)} мин ${item.duration % 60} сек</td>
-            </tr>
-        `)
+                <tr>
+                    <td class="${styles.historyTableCell}">${new Date(item.startedAt).toLocaleString()}</td>
+                    <td class="${styles.historyTableCell} ${
+                        item.result === 'win' ? styles.resultWin : styles.resultLose
+                    }">
+                        ${item.result === 'win' ? 'Победа' : 'Поражение'}
+                    </td>
+                    <td class="${styles.historyTableCell}">${difficultyText}</td>
+                    <td class="${styles.historyTableCell}">
+                        ${Math.floor(item.duration / 60)} мин ${item.duration % 60} сек
+                    </td>
+                </tr>
+            `)
             tbody.appendChild(row)
         })
 
@@ -59,22 +82,6 @@ export function HistoryGame({ onStartGame } = {}) {
     }
 
     content.appendChild(footerContainer)
-
-    const repeatBtn = Button({
-        id: 'repeatGameBtn',
-        text: 'Повторить игру',
-        extraClass: styles.btnRepeat,
-    })
-    const clearBtn = Button({
-        id: 'clearHistoryBtn',
-        text: 'Очистить историю',
-        extraClass: styles.btnClear,
-    })
-    const startBtn = Button({
-        id: 'startGameBtn',
-        text: 'Начать первую игру',
-        extraClass: styles.btnStart,
-    })
 
     if (history.length === 0) {
         footerContainer.appendChild(startBtn)
@@ -90,40 +97,28 @@ export function HistoryGame({ onStartGame } = {}) {
     })
 
     setTimeout(() => {
-        const backBtn = document.getElementById('backBtn')
-        if (backBtn) {
-            backBtn.addEventListener('click', () => setPage('mainPage'))
-        }
+        document.getElementById('backBtn')?.addEventListener('click', () => setPage('mainPage'))
 
-        const clearHistoryBtn = document.getElementById('clearHistoryBtn')
-        if (clearHistoryBtn) {
-            clearHistoryBtn.addEventListener('click', () => {
-                localStorage.removeItem('gameHistory')
-                setPage('historyPage')
-            })
-        }
+        document.getElementById('clearHistoryBtn')?.addEventListener('click', () => {
+            localStorage.removeItem(gameHistoryLSKey)
+            setPage('historyPage')
+        })
 
-        const startGameBtn = document.getElementById('startGameBtn')
-        if (startGameBtn) {
-            startGameBtn.addEventListener('click', () => {
-                if (onStartGame) {
-                    onStartGame()
-                } else {
-                    setPage('gamePage')
-                }
-            })
-        }
+        document.getElementById('startGameBtn')?.addEventListener('click', () => {
+            if (onStartGame) {
+                onStartGame()
+            } else {
+                setPage('gamePage')
+            }
+        })
 
-        const repeatGameBtn = document.getElementById('repeatGameBtn')
-        if (repeatGameBtn) {
-            repeatGameBtn.addEventListener('click', () => {
-                if (onStartGame) {
-                    onStartGame()
-                } else {
-                    setPage('gamePage')
-                }
-            })
-        }
+        document.getElementById('repeatGameBtn')?.addEventListener('click', () => {
+            if (onStartGame) {
+                onStartGame()
+            } else {
+                setPage('gamePage')
+            }
+        })
     })
 
     return layout

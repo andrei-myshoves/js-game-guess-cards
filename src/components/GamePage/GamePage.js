@@ -32,6 +32,7 @@ export const getDefaultGameState = () => ({
     matchedCount: 0,
     startTime: Date.now(),
     timerId: null,
+    elapsedTime: 0,
 })
 
 function saveResultToHistory({ result, difficulty, duration }) {
@@ -50,6 +51,33 @@ function saveResultToHistory({ result, difficulty, duration }) {
     }
 }
 
+function saveGameProgress({ selectedLevel, gameState, cardsData }) {
+    try {
+        const progress = {
+            selectedLevel,
+            matchedCount: gameState.matchedCount,
+            startTime: gameState.startTime,
+            elapsedTime: Math.floor((Date.now() - gameState.startTime) / 1000),
+            cardsData,
+        }
+        localStorage.setItem('activeGame', JSON.stringify(progress))
+    } catch (e) {
+        console.error('Ошибка при сохранении игры:', e)
+    }
+}
+
+export function restoreGameProgress() {
+    try {
+        const saved = localStorage.getItem('activeGame')
+        if (!saved) {
+            return null
+        }
+        return JSON.parse(saved)
+    } catch {
+        return null
+    }
+}
+
 export function GamePage({ selectedLevel = 'easy', onWinCallback, onLoseCallback }) {
     const container = htmlToElement('<div></div>')
     const header = GameMenuHeader()
@@ -61,17 +89,27 @@ export function GamePage({ selectedLevel = 'easy', onWinCallback, onLoseCallback
     `)
     container.appendChild(cardsContainer)
 
-    const pairCount = Math.ceil(cardCount / 2)
-    const selectedImages = [...images].slice(0, pairCount)
-    const cardsData = [...selectedImages, ...selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)
-
+    const savedProgress = restoreGameProgress()
+    let cardsData
     const gameState = getDefaultGameState()
+
+    if (savedProgress && savedProgress.selectedLevel === selectedLevel) {
+        cardsData = savedProgress.cardsData
+        gameState.matchedCount = savedProgress.matchedCount
+        gameState.startTime = Date.now() - savedProgress.elapsedTime * 1000
+    } else {
+        const pairCount = Math.ceil(cardCount / 2)
+        const selectedImages = [...images].slice(0, pairCount)
+        cardsData = [...selectedImages, ...selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)
+    }
+
     const flippedCards = []
 
     const handleWin = () => {
         clearTimeout(gameState.timerId)
         const totalTime = Math.floor((Date.now() - gameState.startTime) / 1000)
         saveResultToHistory({ result: 'win', difficulty: selectedLevel, duration: totalTime })
+        localStorage.removeItem('activeGame')
         if (typeof onWinCallback === 'function') {
             onWinCallback()
         }
@@ -81,13 +119,16 @@ export function GamePage({ selectedLevel = 'easy', onWinCallback, onLoseCallback
         clearTimeout(gameState.timerId)
         const totalTime = Math.floor((Date.now() - gameState.startTime) / 1000)
         saveResultToHistory({ result: 'lose', difficulty: selectedLevel, duration: totalTime })
+        localStorage.removeItem('activeGame')
         if (typeof onLoseCallback === 'function') {
             onLoseCallback()
         }
     }
 
     const levelDuration = levelTimes[selectedLevel] * 1000
-    gameState.timerId = setTimeout(handleLose, levelDuration)
+    const remainingTime = savedProgress ? levelDuration - savedProgress.elapsedTime * 1000 : levelDuration
+
+    gameState.timerId = setTimeout(handleLose, remainingTime)
 
     cardsData.forEach((image, index) => {
         const cardId = `card-${index}`
@@ -101,13 +142,13 @@ export function GamePage({ selectedLevel = 'easy', onWinCallback, onLoseCallback
                 cardCount,
                 onWin: handleWin,
             })
+            saveGameProgress({ selectedLevel, gameState, cardsData })
         })
         cardsContainer.appendChild(card)
     })
 
     return {
         container,
-        selectedImages,
         cardsData,
         cardCount,
         gameState,

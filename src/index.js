@@ -1,7 +1,7 @@
 import { GameMenu, menuItems } from './components/GameMenu/GameMenu.js'
 import { GameSettingsMenu } from './components/GameMenuSettings/GameMenuSettings.js'
 import { Layout } from './components/Layout/Layout.js'
-import { GamePage, handleCardClick } from './components/GamePage/GamePage.js'
+import { GamePage, handleCardClick, restoreGameProgress } from './components/GamePage/GamePage.js'
 import { startTimer, stopTimer, pauseTimer, resumeTimer } from './components/Timer/Timer.js'
 import { Button } from './components/Button/Button.js'
 import { GameRules } from './components/GameRules/GameRules.js'
@@ -270,5 +270,25 @@ document.addEventListener('visibilitychange', () => {
     }
 })
 
-const savedPage = localStorage.getItem(currentPageLSKey) || 'mainPage'
-setPage(savedPage)
+window.addEventListener('DOMContentLoaded', () => {
+    const saved = restoreGameProgress()
+
+    if (saved) {
+        const remaining = levelTimes[saved.selectedLevel] * 1000 - saved.elapsedTime * 1000
+        if (remaining > 0) {
+            const resume = confirm('У вас есть незавершённая игра. Продолжить?')
+            if (resume) {
+                localStorage.setItem(selectedLevelLSKey, saved.selectedLevel)
+                setPage('gamePage')
+                return
+            } else {
+                localStorage.removeItem('activeGame')
+            }
+        } else {
+            localStorage.removeItem('activeGame')
+        }
+    }
+
+    const savedPage = localStorage.getItem(currentPageLSKey) || 'mainPage'
+    setPage(savedPage)
+})

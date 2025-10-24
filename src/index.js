@@ -7,7 +7,7 @@ import { Button } from './components/Button/Button.js'
 import { GameRules } from './components/GameRules/GameRules.js'
 import { HistoryGame } from './components/HistoryGame/HistoryGame.js'
 import './style.css'
-import { selectedLevelLSKey, currentPageLSKey } from './constants.js'
+import { selectedLevelLSKey, currentPageLSKey, gameHistoryLSKey } from './constants.js'
 
 const root = document.getElementById('root')
 
@@ -25,7 +25,32 @@ export function setPage(page) {
             break
         }
         case 'historyPage': {
-            root.appendChild(HistoryGame())
+            const layout = HistoryGame()
+            root.appendChild(layout)
+
+            const backBtn = document.getElementById('backBtn')
+            if (backBtn) {
+                backBtn.addEventListener('click', () => setPage('mainPage'))
+            }
+
+            const clearBtn = document.getElementById('clearHistoryBtn')
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    localStorage.removeItem(gameHistoryLSKey)
+                    setPage('historyPage')
+                })
+            }
+
+            const startBtn = document.getElementById('startGameBtn')
+            if (startBtn) {
+                startBtn.addEventListener('click', () => setPage('gamePage'))
+            }
+
+            const repeatBtn = document.getElementById('repeatGameBtn')
+            if (repeatBtn) {
+                repeatBtn.addEventListener('click', () => setPage('gamePage'))
+            }
+
             break
         }
         case 'gamePage': {

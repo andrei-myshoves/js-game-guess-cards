@@ -2,7 +2,6 @@ import { Layout } from '../Layout/Layout.js'
 import { Button } from '../Button/Button.js'
 import { htmlToElement } from '../../utils/htmlToELement.js'
 import * as styles from './HistoryGame.module.css'
-import { setPage } from '../../index.js'
 import { gameHistoryLSKey } from '../../constants.js'
 
 const difficultyLabels = {
@@ -11,25 +10,7 @@ const difficultyLabels = {
     hard: 'Тяжёлый',
 }
 
-const repeatBtn = Button({
-    id: 'repeatGameBtn',
-    text: 'Повторить игру',
-    extraClass: styles.btnRepeat,
-})
-
-const clearBtn = Button({
-    id: 'clearHistoryBtn',
-    text: 'Очистить историю',
-    extraClass: styles.btnClear,
-})
-
-const startBtn = Button({
-    id: 'startGameBtn',
-    text: 'Начать первую игру',
-    extraClass: styles.btnStart,
-})
-
-export function HistoryGame({ onStartGame } = {}) {
+export function HistoryGame() {
     const history = JSON.parse(localStorage.getItem(gameHistoryLSKey)) || []
 
     const content = htmlToElement(`<div class="${styles.historyContainer}"></div>`)
@@ -43,6 +24,13 @@ export function HistoryGame({ onStartGame } = {}) {
             `<p class="${styles.historyEmptyText}">История игр пуста. Сыграйте первую игру!</p>`
         )
         content.appendChild(emptyText)
+        footerContainer.appendChild(
+            Button({
+                id: 'startGameBtn',
+                text: 'Начать первую игру',
+                extraClass: styles.btnStart,
+            })
+        )
     } else {
         const table = htmlToElement(`<table class="${styles.historyTable}"></table>`)
         const thead = htmlToElement(`
@@ -62,9 +50,7 @@ export function HistoryGame({ onStartGame } = {}) {
             const row = htmlToElement(`
                 <tr>
                     <td class="${styles.historyTableCell}">${new Date(item.startedAt).toLocaleString()}</td>
-                    <td class="${styles.historyTableCell} ${
-                        item.result === 'win' ? styles.resultWin : styles.resultLose
-                    }">
+                    <td class="${styles.historyTableCell} ${item.result === 'win' ? styles.resultWin : styles.resultLose}">
                         ${item.result === 'win' ? 'Победа' : 'Поражение'}
                     </td>
                     <td class="${styles.historyTableCell}">${difficultyText}</td>
@@ -79,47 +65,28 @@ export function HistoryGame({ onStartGame } = {}) {
         table.appendChild(thead)
         table.appendChild(tbody)
         content.appendChild(table)
+
+        headerContainer.appendChild(
+            Button({
+                id: 'repeatGameBtn',
+                text: 'Повторить игру',
+                extraClass: styles.btnRepeat,
+            })
+        )
+        footerContainer.appendChild(
+            Button({
+                id: 'clearHistoryBtn',
+                text: 'Очистить историю',
+                extraClass: styles.btnClear,
+            })
+        )
     }
 
     content.appendChild(footerContainer)
 
-    if (history.length === 0) {
-        footerContainer.appendChild(startBtn)
-    } else {
-        headerContainer.appendChild(repeatBtn)
-        footerContainer.appendChild(clearBtn)
-    }
-
-    const layout = Layout({
+    return Layout({
         title: 'История игр',
         children: content,
         showBack: true,
     })
-
-    setTimeout(() => {
-        document.getElementById('backBtn')?.addEventListener('click', () => setPage('mainPage'))
-
-        document.getElementById('clearHistoryBtn')?.addEventListener('click', () => {
-            localStorage.removeItem(gameHistoryLSKey)
-            setPage('historyPage')
-        })
-
-        document.getElementById('startGameBtn')?.addEventListener('click', () => {
-            if (onStartGame) {
-                onStartGame()
-            } else {
-                setPage('gamePage')
-            }
-        })
-
-        document.getElementById('repeatGameBtn')?.addEventListener('click', () => {
-            if (onStartGame) {
-                onStartGame()
-            } else {
-                setPage('gamePage')
-            }
-        })
-    })
-
-    return layout
 }

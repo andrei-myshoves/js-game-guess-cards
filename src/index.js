@@ -7,6 +7,7 @@ import { Button } from './components/Button/Button.js'
 import { GameRules } from './components/GameRules/GameRules.js'
 import { HistoryGame } from './components/HistoryGame/HistoryGame.js'
 import './style.css'
+import { selectedLevelLSKey, currentPageLSKey, gameHistoryLSKey } from './constants.js'
 
 const root = document.getElementById('root')
 
@@ -24,15 +25,39 @@ export function setPage(page) {
             break
         }
         case 'historyPage': {
-            root.innerHTML = ''
-            root.appendChild(HistoryGame())
+            const layout = HistoryGame()
+            root.appendChild(layout)
+
+            const backBtn = document.getElementById('backBtn')
+            if (backBtn) {
+                backBtn.addEventListener('click', () => setPage('mainPage'))
+            }
+
+            const clearBtn = document.getElementById('clearHistoryBtn')
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    localStorage.removeItem(gameHistoryLSKey)
+                    setPage('historyPage')
+                })
+            }
+
+            const startBtn = document.getElementById('startGameBtn')
+            if (startBtn) {
+                startBtn.addEventListener('click', () => setPage('gamePage'))
+            }
+
+            const repeatBtn = document.getElementById('repeatGameBtn')
+            if (repeatBtn) {
+                repeatBtn.addEventListener('click', () => setPage('gamePage'))
+            }
+
             break
         }
         case 'gamePage': {
-            const level = localStorage.getItem('selectedLevel')
+            const level = localStorage.getItem(selectedLevelLSKey)
             if (level) {
                 renderGamePage(level)
-                localStorage.removeItem('selectedLevel')
+                localStorage.removeItem(selectedLevelLSKey)
             } else {
                 renderPageWithBack({
                     title: 'Выберите сложность',
@@ -57,7 +82,8 @@ export function setPage(page) {
             break
         }
     }
-    localStorage.setItem('currentPage', page)
+
+    localStorage.setItem(currentPageLSKey, page)
 }
 
 function renderMainMenu() {
@@ -102,19 +128,19 @@ function renderPageWithBack({
 
         if (easyBtn) {
             easyBtn.addEventListener('click', () => {
-                localStorage.setItem('selectedLevel', 'easy')
+                localStorage.setItem(selectedLevelLSKey, 'easy')
                 setPage('gamePage')
             })
         }
         if (mediumBtn) {
             mediumBtn.addEventListener('click', () => {
-                localStorage.setItem('selectedLevel', 'medium')
+                localStorage.setItem(selectedLevelLSKey, 'medium')
                 setPage('gamePage')
             })
         }
         if (hardBtn) {
             hardBtn.addEventListener('click', () => {
-                localStorage.setItem('selectedLevel', 'hard')
+                localStorage.setItem(selectedLevelLSKey, 'hard')
                 setPage('gamePage')
             })
         }
@@ -123,9 +149,26 @@ function renderPageWithBack({
 
 function renderGamePage(selectedLevel) {
     const flippedCards = []
-    const gameState = { matchedCount: 0, locked: false }
 
-    const { container, cardsData, cardCount } = GamePage(selectedLevel)
+    const onWinCallback = () => {
+        stopTimer()
+        alert('Вы победили!')
+        setPage('mainPage')
+    }
+
+    const onLoseCallback = () => {
+        stopTimer()
+        alert('Вы проиграли!')
+        setPage('mainPage')
+    }
+
+    const gamePageInstance = GamePage({
+        selectedLevel,
+        onWinCallback,
+        onLoseCallback,
+    })
+
+    const { container, cardsData, cardCount, gameState } = gamePageInstance
 
     const layout = Layout({
         title: 'Игра',
@@ -137,7 +180,6 @@ function renderGamePage(selectedLevel) {
     const endBtn = Button({
         id: 'endGameBtn',
         text: 'Завершить игру',
-        extraClass: '',
     })
     const childrenContainer = document.getElementById('childrenContainer')
     if (childrenContainer) {
@@ -186,45 +228,38 @@ function renderGamePage(selectedLevel) {
             })
 
             startTimer(levelTimes[selectedLevel])
-
-            cardsData.forEach((image, index) => {
-                const cardId = `card-${index}`
-                const cardElement = document.getElementById(cardId)
-                if (!cardElement) {
-                    return
-                }
-                cardElement.addEventListener('click', () =>
-                    handleCardClick({
-                        id: cardId,
-                        image,
-                        flippedCards,
-                        gameState,
-                        cardCount,
-                        onWin: () => {
-                            stopTimer()
-                            alert('Вы победили!')
-                            setPage('mainPage')
-                        },
-                    })
-                )
-            })
         }
     }, 1000)
+
+    cardsData.forEach((image, index) => {
+        const cardId = `card-${index}`
+        const cardElement = document.getElementById(cardId)
+        if (!cardElement) {
+            return
+        }
+        cardElement.addEventListener('click', () =>
+            handleCardClick({
+                id: cardId,
+                image,
+                flippedCards,
+                gameState,
+                cardCount,
+                selectedLevel,
+                onWin: onWinCallback,
+            })
+        )
+    })
 
     const endGame = () => {
         stopTimer()
         clearInterval(previewInterval)
-        alert('Вы проиграли!')
-        setPage('mainPage')
+        if (gamePageInstance?.loseGame) {
+            gamePageInstance.loseGame()
+        }
     }
 
-    if (endBtn) {
-        endBtn.addEventListener('click', endGame)
-    }
-    const backBtn = document.getElementById('backBtn')
-    if (backBtn) {
-        backBtn.addEventListener('click', endGame)
-    }
+    document.getElementById('endGameBtn')?.addEventListener('click', endGame)
+    document.getElementById('backBtn')?.addEventListener('click', endGame)
 }
 
 document.addEventListener('visibilitychange', () => {
@@ -235,5 +270,5 @@ document.addEventListener('visibilitychange', () => {
     }
 })
 
-const savedPage = localStorage.getItem('currentPage') || 'mainPage'
+const savedPage = localStorage.getItem(currentPageLSKey) || 'mainPage'
 setPage(savedPage)

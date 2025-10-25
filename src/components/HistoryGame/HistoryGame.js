@@ -2,136 +2,91 @@ import { Layout } from '../Layout/Layout.js'
 import { Button } from '../Button/Button.js'
 import { htmlToElement } from '../../utils/htmlToELement.js'
 import * as styles from './HistoryGame.module.css'
-import { setPage } from '../../index.js'
+import { gameHistoryLSKey } from '../../constants.js'
 
-const mockHistory = [
-    {
-        startedAt: '2025-10-10T14:12:00',
-        result: 'win',
-        difficulty: 'easy',
-        duration: 82,
-    },
-    {
-        startedAt: '2025-10-09T19:47:00',
-        result: 'lose',
-        difficulty: 'medium',
-        duration: 114,
-    },
-    {
-        startedAt: '2025-10-09T13:33:00',
-        result: 'win',
-        difficulty: 'hard',
-        duration: 61,
-    },
-]
-
-function formatDuration(seconds) {
-    if (!seconds) {
-        return '-'
-    }
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins} мин ${secs} сек`
-}
-
-function formatDifficulty(level) {
-    switch (level) {
-        case 'easy':
-            return 'Лёгкая'
-        case 'medium':
-            return 'Средняя'
-        case 'hard':
-            return 'Сложная'
-        default:
-            return '-'
-    }
+const difficultyLabels = {
+    easy: 'Лёгкий',
+    medium: 'Средний',
+    hard: 'Тяжёлый',
 }
 
 export function HistoryGame() {
-    const rows = mockHistory
-        .map(
-            item => `
-        <tr>
-          <td class="${styles.historyTableCell} ${item.result === 'win' ? styles.resultWin : styles.resultLose}">
-            ${new Date(item.startedAt).toLocaleString()}
-          </td>
-          <td class="${styles.historyTableCell} ${item.result === 'win' ? styles.resultWin : styles.resultLose}">
-            ${item.result === 'win' ? 'Победа' : 'Поражение'}
-          </td>
-          <td class="${styles.historyTableCell}">${formatDifficulty(item.difficulty)}</td>
-          <td class="${styles.historyTableCell}">${formatDuration(item.duration)}</td>
-        </tr>
-    `
+    const history = JSON.parse(localStorage.getItem(gameHistoryLSKey)) || []
+
+    const content = htmlToElement(`<div class="${styles.historyContainer}"></div>`)
+    const headerContainer = htmlToElement(`<div id="headerBtnsContainer" class="${styles.headerButtons}"></div>`)
+    const footerContainer = htmlToElement(`<div id="footerBtnsContainer" class="${styles.footerButtons}"></div>`)
+
+    content.appendChild(headerContainer)
+
+    if (history.length === 0) {
+        const emptyText = htmlToElement(
+            `<p class="${styles.historyEmptyText}">История игр пуста. Сыграйте первую игру!</p>`
         )
-        .join('')
+        content.appendChild(emptyText)
+        footerContainer.appendChild(
+            Button({
+                id: 'startGameBtn',
+                text: 'Начать первую игру',
+                extraClass: styles.btnStart,
+            })
+        )
+    } else {
+        const table = htmlToElement(`<table class="${styles.historyTable}"></table>`)
+        const thead = htmlToElement(`
+            <thead>
+                <tr>
+                    <th class="${styles.historyTableHeader}">Дата и время</th>
+                    <th class="${styles.historyTableHeader}">Результат</th>
+                    <th class="${styles.historyTableHeader}">Сложность</th>
+                    <th class="${styles.historyTableHeader}">Время</th>
+                </tr>
+            </thead>
+        `)
+        const tbody = htmlToElement('<tbody></tbody>')
 
-    const content = htmlToElement(`
-<div class="${styles.historyContainer}">
-  <div id="headerBtnsContainer" class="${styles.headerButtons}"></div>
+        history.forEach(item => {
+            const difficultyText = difficultyLabels[item.difficulty] || item.difficulty
+            const row = htmlToElement(`
+                <tr>
+                    <td class="${styles.historyTableCell}">${new Date(item.startedAt).toLocaleString()}</td>
+                    <td class="${styles.historyTableCell} ${item.result === 'win' ? styles.resultWin : styles.resultLose}">
+                        ${item.result === 'win' ? 'Победа' : 'Поражение'}
+                    </td>
+                    <td class="${styles.historyTableCell}">${difficultyText}</td>
+                    <td class="${styles.historyTableCell}">
+                        ${Math.floor(item.duration / 60)} мин ${item.duration % 60} сек
+                    </td>
+                </tr>
+            `)
+            tbody.appendChild(row)
+        })
 
-  <table class="${styles.historyTable}">
-    <thead>
-      <tr>
-        <th class="${styles.historyTableHeader}">Дата и время</th>
-            <th class="${styles.historyTableHeader}">Результат</th>
-            <th class="${styles.historyTableHeader}">Сложность</th>
-            <th class="${styles.historyTableHeader}">Время</th>
-      </tr>
-    </thead>
-    <tbody>${rows}</tbody>
-  </table>
+        table.appendChild(thead)
+        table.appendChild(tbody)
+        content.appendChild(table)
 
-  <div id="footerBtnsContainer" class="${styles.footerButtons}"></div>
-</div>
-`)
-
-    content.getElementById = function (id) {
-        return this.querySelector(`#${id}`)
+        headerContainer.appendChild(
+            Button({
+                id: 'repeatGameBtn',
+                text: 'Повторить игру',
+                extraClass: styles.btnRepeat,
+            })
+        )
+        footerContainer.appendChild(
+            Button({
+                id: 'clearHistoryBtn',
+                text: 'Очистить историю',
+                extraClass: styles.btnClear,
+            })
+        )
     }
 
-    const repeatBtn = Button({
-        id: 'repeatGameBtn',
-        text: 'Повторить игру',
-        extraClass: styles.btnRepeat,
-    })
+    content.appendChild(footerContainer)
 
-    const clearBtn = Button({
-        id: 'clearHistoryBtn',
-        text: 'Очистить историю',
-        extraClass: styles.btnClear,
-    })
-
-    const headerContainer = content.getElementById('headerBtnsContainer')
-    const footerContainer = content.getElementById('footerBtnsContainer')
-
-    if (headerContainer) {
-        headerContainer.appendChild(repeatBtn)
-    }
-    if (footerContainer) {
-        footerContainer.appendChild(clearBtn)
-    }
-
-    const layout = Layout({
+    return Layout({
         title: 'История игр',
         children: content,
         showBack: true,
     })
-
-    const backBtn = layout.getElementById('backBtn')
-    const repeatGameBtn = layout.getElementById('repeatGameBtn')
-    const clearHistoryBtn = layout.getElementById('clearHistoryBtn')
-
-    if (backBtn) {
-        backBtn.addEventListener('click', () => setPage('mainPage'))
-    }
-
-    if (repeatGameBtn) {
-        repeatGameBtn.addEventListener('click', () => alert('Повторить последнюю игру'))
-    }
-
-    if (clearHistoryBtn) {
-        clearHistoryBtn.addEventListener('click', () => alert('Очистка истории (пока тест)'))
-    }
-
-    return layout
 }

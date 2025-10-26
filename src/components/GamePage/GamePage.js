@@ -51,14 +51,26 @@ function saveResultToHistory({ result, difficulty, duration }) {
     }
 }
 
-function saveGameProgress({ selectedLevel, gameState, cardsData }) {
+export function saveGameProgress({ selectedLevel, gameState, cardsData }) {
     try {
+        const matchedCards = cardsData
+            .map((_, index) => {
+                const front = document.getElementById(`card-${index}-front`)
+                const back = document.getElementById(`card-${index}-back`)
+                if (!front || !back) {
+                    return null
+                }
+                return front.style.display === 'block' ? index : null
+            })
+            .filter(i => i !== null)
+
         const progress = {
             selectedLevel,
             matchedCount: gameState.matchedCount,
             startTime: gameState.startTime,
             elapsedTime: Math.floor((Date.now() - gameState.startTime) / 1000),
             cardsData,
+            matchedCards,
         }
         localStorage.setItem('activeGame', JSON.stringify(progress))
     } catch (e) {

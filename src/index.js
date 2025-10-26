@@ -1,7 +1,7 @@
 import { GameMenu, menuItems } from './components/GameMenu/GameMenu.js'
 import { GameSettingsMenu } from './components/GameMenuSettings/GameMenuSettings.js'
 import { Layout } from './components/Layout/Layout.js'
-import { GamePage, handleCardClick, restoreGameProgress } from './components/GamePage/GamePage.js'
+import { GamePage, handleCardClick, restoreGameProgress, saveGameProgress } from './components/GamePage/GamePage.js'
 import { startTimer, stopTimer, pauseTimer, resumeTimer } from './components/Timer/Timer.js'
 import { Button } from './components/Button/Button.js'
 import { GameRules } from './components/GameRules/GameRules.js'
@@ -136,64 +136,105 @@ function renderGamePage(selectedLevel) {
     })
 
     const { container, cardsData, cardCount, gameState } = gamePageInstance
-
     const layout = Layout({
         title: 'Игра',
         children: container,
         showBack: true,
     })
+    root.innerHTML = ''
     root.appendChild(layout)
 
     const endBtn = Button({ id: 'endGameBtn', text: 'Завершить игру' })
-    document.getElementById('childrenContainer')?.appendChild(endBtn)
+    const childrenContainer = document.getElementById('childrenContainer')
+    if (childrenContainer) {
+        childrenContainer.appendChild(endBtn)
+    }
 
     const guessedEl = document.getElementById('guessedCount')
     const remainingEl = document.getElementById('remainingCount')
-    guessedEl.textContent = String(gameState.matchedCount || 0)
-    remainingEl.textContent = String(cardCount / 2 - (gameState.matchedCount || 0))
+    if (guessedEl) {
+        guessedEl.textContent = String(gameState.matchedCount)
+    }
+    if (remainingEl) {
+        remainingEl.textContent = String(cardCount / 2 - gameState.matchedCount)
+    }
 
-    let previewTime = 5
     const timerEl = document.getElementById('timer')
 
-    cardsData.forEach((_, index) => {
-        const front = document.getElementById(`card-${index}-front`)
-        const back = document.getElementById(`card-${index}-back`)
-        if (front) {
-            front.style.display = 'block'
-        }
-        if (back) {
-            back.style.display = 'none'
-        }
-    })
+    const savedProgress = restoreGameProgress()
+    let previewTime = 5
+    let showPreview = true
 
-    const previewInterval = setInterval(() => {
-        if (timerEl) {
-            timerEl.textContent = `Запоминай: ${previewTime}`
-        }
-        previewTime--
-        if (previewTime < 0) {
-            clearInterval(previewInterval)
-            cardsData.forEach((_, index) => {
-                const front = document.getElementById(`card-${index}-front`)
-                const back = document.getElementById(`card-${index}-back`)
+    if (savedProgress && savedProgress.selectedLevel === selectedLevel) {
+        showPreview = false
+        gameState.matchedCount = savedProgress.matchedCount
+        gameState.startTime = Date.now() - savedProgress.elapsedTime * 1000
+        cardsData.forEach((image, index) => {
+            const front = document.getElementById(`card-${index}-front`)
+            const back = document.getElementById(`card-${index}-back`)
+            if (savedProgress.matchedCards?.includes(index)) {
+                if (front) {
+                    front.style.display = 'block'
+                }
+                if (back) {
+                    back.style.display = 'none'
+                }
+            } else {
                 if (front) {
                     front.style.display = 'none'
                 }
                 if (back) {
                     back.style.display = 'flex'
                 }
-            })
-            startTimer(levelTimes[selectedLevel])
+            }
+        })
+        if (timerEl) {
+            timerEl.textContent = `Осталось: ${levelTimes[selectedLevel] - savedProgress.elapsedTime} сек`
         }
-    }, 1000)
+        startTimer(levelTimes[selectedLevel] - savedProgress.elapsedTime)
+    }
+
+    if (showPreview) {
+        cardsData.forEach((_, index) => {
+            const front = document.getElementById(`card-${index}-front`)
+            const back = document.getElementById(`card-${index}-back`)
+            if (front) {
+                front.style.display = 'block'
+            }
+            if (back) {
+                back.style.display = 'none'
+            }
+        })
+
+        const previewInterval = setInterval(() => {
+            if (timerEl) {
+                timerEl.textContent = `Запоминай: ${previewTime}`
+            }
+            previewTime--
+            if (previewTime < 0) {
+                clearInterval(previewInterval)
+                cardsData.forEach((_, index) => {
+                    const front = document.getElementById(`card-${index}-front`)
+                    const back = document.getElementById(`card-${index}-back`)
+                    if (front) {
+                        front.style.display = 'none'
+                    }
+                    if (back) {
+                        back.style.display = 'flex'
+                    }
+                })
+                startTimer(levelTimes[selectedLevel])
+            }
+        }, 1000)
+    }
 
     cardsData.forEach((image, index) => {
         const cardId = `card-${index}`
-        const card = document.getElementById(cardId)
-        if (!card) {
+        const cardElement = document.getElementById(cardId)
+        if (!cardElement) {
             return
         }
-        card.addEventListener('click', () =>
+        cardElement.addEventListener('click', () => {
             handleCardClick({
                 id: cardId,
                 image,
@@ -203,13 +244,15 @@ function renderGamePage(selectedLevel) {
                 selectedLevel,
                 onWin: onWinCallback,
             })
-        )
+            saveGameProgress({ selectedLevel, gameState, cardsData })
+        })
     })
 
     const endGame = () => {
         stopTimer()
-        clearInterval(previewInterval)
-        gamePageInstance?.loseGame?.()
+        if (gamePageInstance?.loseGame) {
+            gamePageInstance.loseGame()
+        }
     }
 
     document.getElementById('endGameBtn')?.addEventListener('click', endGame)

@@ -36,34 +36,25 @@ export const getDefaultGameState = () => ({
 })
 
 function saveResultToHistory({ result, difficulty, duration }) {
-    try {
-        const history = JSON.parse(localStorage.getItem(gameHistoryLSKey)) || []
-        const newEntry = {
-            startedAt: new Date().toISOString(),
-            result,
-            difficulty,
-            duration,
-        }
-        history.push(newEntry)
-        localStorage.setItem(gameHistoryLSKey, JSON.stringify(history))
-    } catch (error) {
-        console.error('Ошибка при сохранении истории игры:', error)
-    }
+    const history = JSON.parse(localStorage.getItem(gameHistoryLSKey)) || []
+    history.push({
+        startedAt: new Date().toISOString(),
+        result,
+        difficulty,
+        duration,
+    })
+    localStorage.setItem(gameHistoryLSKey, JSON.stringify(history))
 }
 
 function saveGameProgress({ selectedLevel, gameState, cardsData }) {
-    try {
-        const progress = {
-            selectedLevel,
-            matchedCount: gameState.matchedCount,
-            startTime: gameState.startTime,
-            elapsedTime: Math.floor((Date.now() - gameState.startTime) / 1000),
-            cardsData,
-        }
-        localStorage.setItem('activeGame', JSON.stringify(progress))
-    } catch (e) {
-        console.error('Ошибка при сохранении игры:', e)
+    const progress = {
+        selectedLevel,
+        matchedCount: gameState.matchedCount,
+        startTime: gameState.startTime,
+        elapsedTime: Math.floor((Date.now() - gameState.startTime) / 1000),
+        cardsData,
     }
+    localStorage.setItem('activeGame', JSON.stringify(progress))
 }
 
 export function restoreGameProgress() {
@@ -85,8 +76,8 @@ export function GamePage({ selectedLevel = 'easy', onWinCallback, onLoseCallback
 
     const cardCount = levels[selectedLevel]
     const cardsContainer = htmlToElement(`
-        <div id="cards-container" class="${pageStyles.cardsGrid} ${getGridClass(cardCount)}"></div>
-    `)
+    <div id="cards-container" class="${pageStyles.cardsGrid} ${getGridClass(cardCount)}"></div>
+  `)
     container.appendChild(cardsContainer)
 
     const savedProgress = restoreGameProgress()
@@ -106,29 +97,23 @@ export function GamePage({ selectedLevel = 'easy', onWinCallback, onLoseCallback
     const flippedCards = []
 
     const handleWin = () => {
-        clearTimeout(gameState.timerId)
         const totalTime = Math.floor((Date.now() - gameState.startTime) / 1000)
         saveResultToHistory({ result: 'win', difficulty: selectedLevel, duration: totalTime })
         localStorage.removeItem('activeGame')
-        if (typeof onWinCallback === 'function') {
-            onWinCallback()
-        }
+        onWinCallback?.()
     }
 
     const handleLose = () => {
-        clearTimeout(gameState.timerId)
         const totalTime = Math.floor((Date.now() - gameState.startTime) / 1000)
         saveResultToHistory({ result: 'lose', difficulty: selectedLevel, duration: totalTime })
         localStorage.removeItem('activeGame')
-        if (typeof onLoseCallback === 'function') {
-            onLoseCallback()
-        }
+        onLoseCallback?.()
     }
 
     const levelDuration = levelTimes[selectedLevel] * 1000
     const remainingTime = savedProgress ? levelDuration - savedProgress.elapsedTime * 1000 : levelDuration
 
-    gameState.timerId = setTimeout(handleLose, remainingTime)
+    setTimeout(handleLose, remainingTime)
 
     cardsData.forEach((image, index) => {
         const cardId = `card-${index}`
@@ -180,14 +165,8 @@ export function handleCardClick({ id, image, flippedCards, gameState, cardCount,
             flippedCards.length = 0
             gameState.locked = false
 
-            const guessedEl = document.getElementById('guessedCount')
-            const remainingEl = document.getElementById('remainingCount')
-            if (guessedEl) {
-                guessedEl.textContent = String(gameState.matchedCount)
-            }
-            if (remainingEl) {
-                remainingEl.textContent = String(cardCount / 2 - gameState.matchedCount)
-            }
+            document.getElementById('guessedCount').textContent = String(gameState.matchedCount)
+            document.getElementById('remainingCount').textContent = String(cardCount / 2 - gameState.matchedCount)
 
             if (gameState.matchedCount === cardCount / 2) {
                 setTimeout(onWin, 300)

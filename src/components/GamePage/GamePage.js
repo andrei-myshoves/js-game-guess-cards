@@ -36,25 +36,34 @@ export const getDefaultGameState = () => ({
 })
 
 function saveResultToHistory({ result, difficulty, duration }) {
-    const history = JSON.parse(localStorage.getItem(gameHistoryLSKey)) || []
-    history.push({
-        startedAt: new Date().toISOString(),
-        result,
-        difficulty,
-        duration,
-    })
-    localStorage.setItem(gameHistoryLSKey, JSON.stringify(history))
+    try {
+        const history = JSON.parse(localStorage.getItem(gameHistoryLSKey)) || []
+        const newEntry = {
+            startedAt: new Date().toISOString(),
+            result,
+            difficulty,
+            duration,
+        }
+        history.push(newEntry)
+        localStorage.setItem(gameHistoryLSKey, JSON.stringify(history))
+    } catch (error) {
+        console.error('Ошибка при сохранении истории игры:', error)
+    }
 }
 
 function saveGameProgress({ selectedLevel, gameState, cardsData }) {
-    const progress = {
-        selectedLevel,
-        matchedCount: gameState.matchedCount,
-        startTime: gameState.startTime,
-        elapsedTime: Math.floor((Date.now() - gameState.startTime) / 1000),
-        cardsData,
+    try {
+        const progress = {
+            selectedLevel,
+            matchedCount: gameState.matchedCount,
+            startTime: gameState.startTime,
+            elapsedTime: Math.floor((Date.now() - gameState.startTime) / 1000),
+            cardsData,
+        }
+        localStorage.setItem('activeGame', JSON.stringify(progress))
+    } catch (e) {
+        console.error('Ошибка при сохранении игры:', e)
     }
-    localStorage.setItem('activeGame', JSON.stringify(progress))
 }
 
 export function restoreGameProgress() {

@@ -32,6 +32,8 @@ export const getDefaultGameState = () => ({
     matchedCount: 0,
     startTime: Date.now(),
     timerId: null,
+    elapsedTime: 0,
+    matchedCards: [],
 })
 
 function saveResultToHistory({ result, difficulty, duration }) {
@@ -50,6 +52,34 @@ function saveResultToHistory({ result, difficulty, duration }) {
     }
 }
 
+export function saveGameProgress({ selectedLevel, gameState, cardsData }) {
+    try {
+        const progress = {
+            selectedLevel,
+            matchedCount: gameState.matchedCount,
+            startTime: gameState.startTime,
+            elapsedTime: Math.floor((Date.now() - gameState.startTime) / 1000),
+            cardsData,
+            matchedCards: gameState.matchedCards || [],
+        }
+        localStorage.setItem('activeGame', JSON.stringify(progress))
+    } catch (e) {
+        console.error('Ошибка при сохранении игры:', e)
+    }
+}
+
+export function restoreGameProgress() {
+    try {
+        const saved = localStorage.getItem('activeGame')
+        if (!saved) {
+            return null
+        }
+        return JSON.parse(saved)
+    } catch {
+        return null
+    }
+}
+
 export function GamePage({ selectedLevel = 'easy', onWinCallback, onLoseCallback }) {
     const container = htmlToElement('<div></div>')
     const header = GameMenuHeader()
@@ -57,37 +87,45 @@ export function GamePage({ selectedLevel = 'easy', onWinCallback, onLoseCallback
 
     const cardCount = levels[selectedLevel]
     const cardsContainer = htmlToElement(`
-        <div id="cards-container" class="${pageStyles.cardsGrid} ${getGridClass(cardCount)}"></div>
-    `)
+    <div id="cards-container" class="${pageStyles.cardsGrid} ${getGridClass(cardCount)}"></div>
+  `)
     container.appendChild(cardsContainer)
 
-    const pairCount = Math.ceil(cardCount / 2)
-    const selectedImages = [...images].slice(0, pairCount)
-    const cardsData = [...selectedImages, ...selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)
-
+    const savedProgress = restoreGameProgress()
+    let cardsData
     const gameState = getDefaultGameState()
+
+    if (savedProgress && savedProgress.selectedLevel === selectedLevel) {
+        cardsData = savedProgress.cardsData
+        gameState.matchedCount = savedProgress.matchedCount
+        gameState.startTime = Date.now() - savedProgress.elapsedTime * 1000
+        gameState.matchedCards = savedProgress.matchedCards || []
+    } else {
+        const pairCount = Math.ceil(cardCount / 2)
+        const selectedImages = [...images].slice(0, pairCount)
+        cardsData = [...selectedImages, ...selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)
+    }
+
     const flippedCards = []
 
     const handleWin = () => {
-        clearTimeout(gameState.timerId)
         const totalTime = Math.floor((Date.now() - gameState.startTime) / 1000)
         saveResultToHistory({ result: 'win', difficulty: selectedLevel, duration: totalTime })
-        if (typeof onWinCallback === 'function') {
-            onWinCallback()
-        }
+        localStorage.removeItem('activeGame')
+        onWinCallback?.()
     }
 
     const handleLose = () => {
-        clearTimeout(gameState.timerId)
         const totalTime = Math.floor((Date.now() - gameState.startTime) / 1000)
         saveResultToHistory({ result: 'lose', difficulty: selectedLevel, duration: totalTime })
-        if (typeof onLoseCallback === 'function') {
-            onLoseCallback()
-        }
+        localStorage.removeItem('activeGame')
+        onLoseCallback?.()
     }
 
     const levelDuration = levelTimes[selectedLevel] * 1000
-    gameState.timerId = setTimeout(handleLose, levelDuration)
+    const remainingTime = savedProgress ? levelDuration - savedProgress.elapsedTime * 1000 : levelDuration
+
+    setTimeout(handleLose, remainingTime)
 
     cardsData.forEach((image, index) => {
         const cardId = `card-${index}`
@@ -101,13 +139,13 @@ export function GamePage({ selectedLevel = 'easy', onWinCallback, onLoseCallback
                 cardCount,
                 onWin: handleWin,
             })
+            saveGameProgress({ selectedLevel, gameState, cardsData })
         })
         cardsContainer.appendChild(card)
     })
 
     return {
         container,
-        selectedImages,
         cardsData,
         cardCount,
         gameState,
@@ -136,17 +174,16 @@ export function handleCardClick({ id, image, flippedCards, gameState, cardCount,
 
         if (first.image === second.image) {
             gameState.matchedCount++
+
+            const firstIndex = parseInt(first.cardId.split('-')[1], 10)
+            const secondIndex = parseInt(second.cardId.split('-')[1], 10)
+            gameState.matchedCards.push(firstIndex, secondIndex)
+
             flippedCards.length = 0
             gameState.locked = false
 
-            const guessedEl = document.getElementById('guessedCount')
-            const remainingEl = document.getElementById('remainingCount')
-            if (guessedEl) {
-                guessedEl.textContent = String(gameState.matchedCount)
-            }
-            if (remainingEl) {
-                remainingEl.textContent = String(cardCount / 2 - gameState.matchedCount)
-            }
+            document.getElementById('guessedCount').textContent = String(gameState.matchedCount)
+            document.getElementById('remainingCount').textContent = String(cardCount / 2 - gameState.matchedCount)
 
             if (gameState.matchedCount === cardCount / 2) {
                 setTimeout(onWin, 300)

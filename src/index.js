@@ -1,7 +1,7 @@
 import { GameMenu, menuItems } from './components/GameMenu/GameMenu.js'
 import { GameSettingsMenu } from './components/GameMenuSettings/GameMenuSettings.js'
 import { Layout } from './components/Layout/Layout.js'
-import { GamePage, handleCardClick } from './components/GamePage/GamePage.js'
+import { GamePage, handleCardClick, restoreGameProgress, saveGameProgress } from './components/GamePage/GamePage.js'
 import { startTimer, stopTimer, pauseTimer, resumeTimer } from './components/Timer/Timer.js'
 import { Button } from './components/Button/Button.js'
 import { GameRules } from './components/GameRules/GameRules.js'
@@ -19,6 +19,7 @@ export const levelTimes = {
 
 export function setPage(page) {
     root.innerHTML = ''
+
     switch (page) {
         case 'mainPage': {
             renderMainMenu()
@@ -28,29 +29,13 @@ export function setPage(page) {
             const layout = HistoryGame()
             root.appendChild(layout)
 
-            const backBtn = document.getElementById('backBtn')
-            if (backBtn) {
-                backBtn.addEventListener('click', () => setPage('mainPage'))
-            }
-
-            const clearBtn = document.getElementById('clearHistoryBtn')
-            if (clearBtn) {
-                clearBtn.addEventListener('click', () => {
-                    localStorage.removeItem(gameHistoryLSKey)
-                    setPage('historyPage')
-                })
-            }
-
-            const startBtn = document.getElementById('startGameBtn')
-            if (startBtn) {
-                startBtn.addEventListener('click', () => setPage('gamePage'))
-            }
-
-            const repeatBtn = document.getElementById('repeatGameBtn')
-            if (repeatBtn) {
-                repeatBtn.addEventListener('click', () => setPage('gamePage'))
-            }
-
+            document.getElementById('backBtn')?.addEventListener('click', () => setPage('mainPage'))
+            document.getElementById('clearHistoryBtn')?.addEventListener('click', () => {
+                localStorage.removeItem(gameHistoryLSKey)
+                setPage('historyPage')
+            })
+            document.getElementById('startGameBtn')?.addEventListener('click', () => setPage('gamePage'))
+            document.getElementById('repeatGameBtn')?.addEventListener('click', () => setPage('gamePage'))
             break
         }
         case 'gamePage': {
@@ -66,6 +51,22 @@ export function setPage(page) {
                     pageName: 'mainPage',
                 })
             }
+            break
+        }
+        case 'leaderboardPage': {
+            import('./components/LeaderboardPage/LeaderboardPage.js').then(({ LeaderboardPage }) => {
+                LeaderboardPage().then(container => {
+                    const layout = Layout({
+                        title: 'Таблица лидеров',
+                        children: container,
+                        showBack: true,
+                    })
+                    root.innerHTML = ''
+                    root.appendChild(layout)
+
+                    document.getElementById('backBtn')?.addEventListener('click', () => setPage('mainPage'))
+                })
+            })
             break
         }
         case 'settingsPage': {
@@ -91,7 +92,6 @@ function renderMainMenu() {
         children: GameMenu(),
         showBack: false,
     })
-
     root.appendChild(layout)
 
     menuItems.forEach(item => {
@@ -116,34 +116,17 @@ function renderPageWithBack({
     })
     root.appendChild(layout)
 
-    const backBtn = document.getElementById('backBtn')
-    if (backBtn) {
-        backBtn.addEventListener('click', () => setPage(pageName))
-    }
+    document.getElementById('backBtn')?.addEventListener('click', () => setPage(pageName))
 
     if (isSettingsMenu) {
-        const easyBtn = document.getElementById('easy')
-        const mediumBtn = document.getElementById('medium')
-        const hardBtn = document.getElementById('hard')
+        const handleSelect = level => {
+            localStorage.setItem(selectedLevelLSKey, level)
+            setPage('gamePage')
+        }
 
-        if (easyBtn) {
-            easyBtn.addEventListener('click', () => {
-                localStorage.setItem(selectedLevelLSKey, 'easy')
-                setPage('gamePage')
-            })
-        }
-        if (mediumBtn) {
-            mediumBtn.addEventListener('click', () => {
-                localStorage.setItem(selectedLevelLSKey, 'medium')
-                setPage('gamePage')
-            })
-        }
-        if (hardBtn) {
-            hardBtn.addEventListener('click', () => {
-                localStorage.setItem(selectedLevelLSKey, 'hard')
-                setPage('gamePage')
-            })
-        }
+        document.getElementById('easy')?.addEventListener('click', () => handleSelect('easy'))
+        document.getElementById('medium')?.addEventListener('click', () => handleSelect('medium'))
+        document.getElementById('hard')?.addEventListener('click', () => handleSelect('hard'))
     }
 }
 
@@ -169,18 +152,15 @@ function renderGamePage(selectedLevel) {
     })
 
     const { container, cardsData, cardCount, gameState } = gamePageInstance
-
     const layout = Layout({
         title: 'Игра',
         children: container,
         showBack: true,
     })
+    root.innerHTML = ''
     root.appendChild(layout)
 
-    const endBtn = Button({
-        id: 'endGameBtn',
-        text: 'Завершить игру',
-    })
+    const endBtn = Button({ id: 'endGameBtn', text: 'Завершить игру' })
     const childrenContainer = document.getElementById('childrenContainer')
     if (childrenContainer) {
         childrenContainer.appendChild(endBtn)
@@ -189,47 +169,80 @@ function renderGamePage(selectedLevel) {
     const guessedEl = document.getElementById('guessedCount')
     const remainingEl = document.getElementById('remainingCount')
     if (guessedEl) {
-        guessedEl.textContent = '0'
+        guessedEl.textContent = String(gameState.matchedCount)
     }
     if (remainingEl) {
-        remainingEl.textContent = String(cardCount / 2)
+        remainingEl.textContent = String(cardCount / 2 - gameState.matchedCount)
     }
 
-    cardsData.forEach((_, index) => {
-        const front = document.getElementById(`card-${index}-front`)
-        const back = document.getElementById(`card-${index}-back`)
-        if (front) {
-            front.style.display = 'block'
-        }
-        if (back) {
-            back.style.display = 'none'
-        }
-    })
-
-    let previewTime = 5
     const timerEl = document.getElementById('timer')
-    const previewInterval = setInterval(() => {
-        if (timerEl) {
-            timerEl.textContent = `Запоминай: ${previewTime}`
-        }
-        previewTime--
-        if (previewTime < 0) {
-            clearInterval(previewInterval)
 
-            cardsData.forEach((_, index) => {
-                const front = document.getElementById(`card-${index}-front`)
-                const back = document.getElementById(`card-${index}-back`)
+    const savedProgress = restoreGameProgress()
+    let previewTime = 5
+    let showPreview = true
+
+    if (savedProgress && savedProgress.selectedLevel === selectedLevel) {
+        showPreview = false
+        gameState.matchedCount = savedProgress.matchedCount
+        gameState.startTime = Date.now() - savedProgress.elapsedTime * 1000
+        cardsData.forEach((image, index) => {
+            const front = document.getElementById(`card-${index}-front`)
+            const back = document.getElementById(`card-${index}-back`)
+            if (savedProgress.matchedCards?.includes(index)) {
+                if (front) {
+                    front.style.display = 'block'
+                }
+                if (back) {
+                    back.style.display = 'none'
+                }
+            } else {
                 if (front) {
                     front.style.display = 'none'
                 }
                 if (back) {
                     back.style.display = 'flex'
                 }
-            })
-
-            startTimer(levelTimes[selectedLevel])
+            }
+        })
+        if (timerEl) {
+            timerEl.textContent = `Осталось: ${levelTimes[selectedLevel] - savedProgress.elapsedTime} сек`
         }
-    }, 1000)
+        startTimer(levelTimes[selectedLevel] - savedProgress.elapsedTime)
+    }
+
+    if (showPreview) {
+        cardsData.forEach((_, index) => {
+            const front = document.getElementById(`card-${index}-front`)
+            const back = document.getElementById(`card-${index}-back`)
+            if (front) {
+                front.style.display = 'block'
+            }
+            if (back) {
+                back.style.display = 'none'
+            }
+        })
+
+        const previewInterval = setInterval(() => {
+            if (timerEl) {
+                timerEl.textContent = `Запоминай: ${previewTime}`
+            }
+            previewTime--
+            if (previewTime < 0) {
+                clearInterval(previewInterval)
+                cardsData.forEach((_, index) => {
+                    const front = document.getElementById(`card-${index}-front`)
+                    const back = document.getElementById(`card-${index}-back`)
+                    if (front) {
+                        front.style.display = 'none'
+                    }
+                    if (back) {
+                        back.style.display = 'flex'
+                    }
+                })
+                startTimer(levelTimes[selectedLevel])
+            }
+        }, 1000)
+    }
 
     cardsData.forEach((image, index) => {
         const cardId = `card-${index}`
@@ -237,7 +250,7 @@ function renderGamePage(selectedLevel) {
         if (!cardElement) {
             return
         }
-        cardElement.addEventListener('click', () =>
+        cardElement.addEventListener('click', () => {
             handleCardClick({
                 id: cardId,
                 image,
@@ -247,12 +260,12 @@ function renderGamePage(selectedLevel) {
                 selectedLevel,
                 onWin: onWinCallback,
             })
-        )
+            saveGameProgress({ selectedLevel, gameState, cardsData })
+        })
     })
 
     const endGame = () => {
         stopTimer()
-        clearInterval(previewInterval)
         if (gamePageInstance?.loseGame) {
             gamePageInstance.loseGame()
         }
@@ -270,5 +283,27 @@ document.addEventListener('visibilitychange', () => {
     }
 })
 
-const savedPage = localStorage.getItem(currentPageLSKey) || 'mainPage'
-setPage(savedPage)
+export function initApp() {
+    const saved = restoreGameProgress()
+
+    if (saved) {
+        const remaining = levelTimes[saved.selectedLevel] * 1000 - saved.elapsedTime * 1000
+        if (remaining > 0) {
+            const resume = confirm('У вас есть незавершённая игра. Продолжить?')
+            if (resume) {
+                localStorage.setItem(selectedLevelLSKey, saved.selectedLevel)
+                setPage('gamePage')
+                return
+            } else {
+                localStorage.removeItem('activeGame')
+            }
+        } else {
+            localStorage.removeItem('activeGame')
+        }
+    }
+
+    const savedPage = localStorage.getItem(currentPageLSKey) || 'mainPage'
+    setPage(savedPage)
+}
+
+initApp()

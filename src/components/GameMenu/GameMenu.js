@@ -5,6 +5,7 @@ import { htmlToElement } from '../../utils/htmlToELement.js'
 export const menuItems = [
     { id: 'gamePage', text: 'Начать игру', extraClass: styles.buttonStart },
     { id: 'historyPage', text: 'История игр', extraClass: styles.buttonHistory },
+    { id: 'leaderboardPage', text: 'Таблица лидеров', extraClass: styles.buttonLeaderboard },
     { id: 'settingsPage', text: 'Изучить инструкцию', extraClass: styles.buttonInstruction },
 ]
 

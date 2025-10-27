@@ -33,6 +33,7 @@ export const getDefaultGameState = () => ({
     startTime: Date.now(),
     timerId: null,
     elapsedTime: 0,
+    matchedCards: [],
 })
 
 function saveResultToHistory({ result, difficulty, duration }) {
@@ -53,24 +54,13 @@ function saveResultToHistory({ result, difficulty, duration }) {
 
 export function saveGameProgress({ selectedLevel, gameState, cardsData }) {
     try {
-        const matchedCards = cardsData
-            .map((_, index) => {
-                const front = document.getElementById(`card-${index}-front`)
-                const back = document.getElementById(`card-${index}-back`)
-                if (!front || !back) {
-                    return null
-                }
-                return front.style.display === 'block' ? index : null
-            })
-            .filter(i => i !== null)
-
         const progress = {
             selectedLevel,
             matchedCount: gameState.matchedCount,
             startTime: gameState.startTime,
             elapsedTime: Math.floor((Date.now() - gameState.startTime) / 1000),
             cardsData,
-            matchedCards,
+            matchedCards: gameState.matchedCards || [],
         }
         localStorage.setItem('activeGame', JSON.stringify(progress))
     } catch (e) {
@@ -109,6 +99,7 @@ export function GamePage({ selectedLevel = 'easy', onWinCallback, onLoseCallback
         cardsData = savedProgress.cardsData
         gameState.matchedCount = savedProgress.matchedCount
         gameState.startTime = Date.now() - savedProgress.elapsedTime * 1000
+        gameState.matchedCards = savedProgress.matchedCards || []
     } else {
         const pairCount = Math.ceil(cardCount / 2)
         const selectedImages = [...images].slice(0, pairCount)
@@ -183,6 +174,11 @@ export function handleCardClick({ id, image, flippedCards, gameState, cardCount,
 
         if (first.image === second.image) {
             gameState.matchedCount++
+
+            const firstIndex = parseInt(first.cardId.split('-')[1], 10)
+            const secondIndex = parseInt(second.cardId.split('-')[1], 10)
+            gameState.matchedCards.push(firstIndex, secondIndex)
+
             flippedCards.length = 0
             gameState.locked = false
 

@@ -60,6 +60,22 @@ export function setPage(page) {
             }
             break
         }
+        case 'leaderboardPage': {
+            import('./components/LeaderboardPage/LeaderboardPage.js').then(({ LeaderboardPage }) => {
+                LeaderboardPage().then(container => {
+                    const layout = Layout({
+                        title: 'Таблица лидеров',
+                        children: container,
+                        showBack: true,
+                    })
+                    root.innerHTML = ''
+                    root.appendChild(layout)
+
+                    document.getElementById('backBtn')?.addEventListener('click', () => setPage('mainPage'))
+                })
+            })
+            break
+        }
         case 'settingsPage': {
             renderPageWithBack({
                 title: 'Инструкция',

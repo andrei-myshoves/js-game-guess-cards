@@ -1,7 +1,14 @@
 import { GameMenu, menuItems } from './components/GameMenu/GameMenu.js'
 import { GameSettingsMenu } from './components/GameMenuSettings/GameMenuSettings.js'
 import { Layout } from './components/Layout/Layout.js'
-import { GamePage, handleCardClick, restoreGameProgress, saveGameProgress } from './components/GamePage/GamePage.js'
+import {
+    GamePage,
+    handleCardClick,
+    restoreGameProgress,
+    saveGameProgress,
+    generateCards,
+    getDefaultGameState,
+} from './components/GamePage/GamePage.js'
 import { startTimer, stopTimer, pauseTimer, resumeTimer } from './components/Timer/Timer.js'
 import { Button } from './components/Button/Button.js'
 import { GameRules } from './components/GameRules/GameRules.js'
@@ -86,8 +93,18 @@ function renderMainMenu() {
     })
 }
 
-function renderPageWithBack({ title, nextTitle, isSettingsMenu = false, pageName = 'mainPage' }) {
-    const layout = Layout({ title, children: nextTitle, showBack: true })
+function renderPageWithBack({
+    title,
+    nextTitle,
+    isSettingsMenu = false,
+    pageName = 'mainPage',
+    showBackButton = true,
+}) {
+    const layout = Layout({
+        title,
+        children: nextTitle,
+        showBack: showBackButton,
+    })
     root.appendChild(layout)
 
     document.getElementById('backBtn')?.addEventListener('click', () => setPage(pageName))
@@ -95,6 +112,12 @@ function renderPageWithBack({ title, nextTitle, isSettingsMenu = false, pageName
     if (isSettingsMenu) {
         const handleSelect = level => {
             localStorage.setItem(selectedLevelLSKey, level)
+
+            const gameState = getDefaultGameState()
+
+            const cardsData = generateCards(level)
+            saveGameProgress({ selectedLevel: level, gameState, cardsData })
+
             setPage('gamePage')
         }
 
@@ -138,7 +161,11 @@ function renderGamePage(selectedLevel) {
     let previewTime = 5
     let showPreview = true
 
-    if (savedProgress && savedProgress.selectedLevel === selectedLevel) {
+    if (
+        savedProgress &&
+        savedProgress.selectedLevel === selectedLevel &&
+        (savedProgress.matchedCount > 0 || savedProgress.elapsedTime > 0)
+    ) {
         showPreview = false
         gameState.matchedCount = savedProgress.matchedCount
         gameState.startTime = Date.now() - savedProgress.elapsedTime * 1000
@@ -247,19 +274,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const saved = restoreGameProgress()
 
     if (saved) {
-        const remaining = levelTimes[saved.selectedLevel] * 1000 - saved.elapsedTime * 1000
-        if (remaining > 0) {
-            const resume = confirm('У вас есть незавершённая игра. Продолжить?')
-            if (resume) {
-                localStorage.setItem(selectedLevelLSKey, saved.selectedLevel)
-                setPage('gamePage')
-                return
-            } else {
-                localStorage.removeItem('activeGame')
-            }
-        } else {
-            localStorage.removeItem('activeGame')
-        }
+        localStorage.setItem(selectedLevelLSKey, saved.selectedLevel)
+        setPage('gamePage')
+        return
     }
 
     const savedPage = localStorage.getItem(currentPageLSKey) || 'mainPage'

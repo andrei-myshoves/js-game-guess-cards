@@ -15,6 +15,13 @@ const images = [
     '/img/Water.webp',
 ]
 
+export function generateCards(selectedLevel) {
+    const cardCount = levels[selectedLevel]
+    const pairCount = Math.ceil(cardCount / 2)
+    const selectedImages = [...images].slice(0, pairCount)
+    return [...selectedImages, ...selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)
+}
+
 export const levels = { easy: 6, medium: 10, hard: 14 }
 
 function getGridClass(cardCount) {

@@ -86,18 +86,8 @@ function renderMainMenu() {
     })
 }
 
-function renderPageWithBack({
-    title,
-    nextTitle,
-    isSettingsMenu = false,
-    pageName = 'mainPage',
-    showBackButton = true,
-}) {
-    const layout = Layout({
-        title,
-        children: nextTitle,
-        showBack: showBackButton,
-    })
+function renderPageWithBack({ title, nextTitle, isSettingsMenu = false, pageName = 'mainPage' }) {
+    const layout = Layout({ title, children: nextTitle, showBack: true })
     root.appendChild(layout)
 
     document.getElementById('backBtn')?.addEventListener('click', () => setPage(pageName))
@@ -129,35 +119,18 @@ function renderGamePage(selectedLevel) {
         setPage('mainPage')
     }
 
-    const gamePageInstance = GamePage({
-        selectedLevel,
-        onWinCallback,
-        onLoseCallback,
-    })
-
+    const gamePageInstance = GamePage({ selectedLevel, onWinCallback, onLoseCallback })
     const { container, cardsData, cardCount, gameState } = gamePageInstance
-    const layout = Layout({
-        title: 'Игра',
-        children: container,
-        showBack: true,
-    })
+
+    const layout = Layout({ title: 'Игра', children: container, showBack: true })
     root.innerHTML = ''
     root.appendChild(layout)
 
     const endBtn = Button({ id: 'endGameBtn', text: 'Завершить игру' })
-    const childrenContainer = document.getElementById('childrenContainer')
-    if (childrenContainer) {
-        childrenContainer.appendChild(endBtn)
-    }
+    document.getElementById('childrenContainer')?.appendChild(endBtn)
 
-    const guessedEl = document.getElementById('guessedCount')
-    const remainingEl = document.getElementById('remainingCount')
-    if (guessedEl) {
-        guessedEl.textContent = String(gameState.matchedCount)
-    }
-    if (remainingEl) {
-        remainingEl.textContent = String(cardCount / 2 - gameState.matchedCount)
-    }
+    document.getElementById('guessedCount').textContent = String(gameState.matchedCount)
+    document.getElementById('remainingCount').textContent = String(cardCount / 2 - gameState.matchedCount)
 
     const timerEl = document.getElementById('timer')
 
@@ -169,10 +142,12 @@ function renderGamePage(selectedLevel) {
         showPreview = false
         gameState.matchedCount = savedProgress.matchedCount
         gameState.startTime = Date.now() - savedProgress.elapsedTime * 1000
+        const matchedCards = Array.isArray(savedProgress.matchedCards) ? savedProgress.matchedCards : []
+
         cardsData.forEach((image, index) => {
             const front = document.getElementById(`card-${index}-front`)
             const back = document.getElementById(`card-${index}-back`)
-            if (savedProgress.matchedCards?.includes(index)) {
+            if (matchedCards.includes(index)) {
                 if (front) {
                     front.style.display = 'block'
                 }
@@ -188,9 +163,11 @@ function renderGamePage(selectedLevel) {
                 }
             }
         })
+
         if (timerEl) {
             timerEl.textContent = `Осталось: ${levelTimes[selectedLevel] - savedProgress.elapsedTime} сек`
         }
+
         startTimer(levelTimes[selectedLevel] - savedProgress.elapsedTime)
     }
 
@@ -234,6 +211,7 @@ function renderGamePage(selectedLevel) {
         if (!cardElement) {
             return
         }
+
         cardElement.addEventListener('click', () => {
             handleCardClick({
                 id: cardId,
@@ -250,9 +228,7 @@ function renderGamePage(selectedLevel) {
 
     const endGame = () => {
         stopTimer()
-        if (gamePageInstance?.loseGame) {
-            gamePageInstance.loseGame()
-        }
+        gamePageInstance?.loseGame?.()
     }
 
     document.getElementById('endGameBtn')?.addEventListener('click', endGame)

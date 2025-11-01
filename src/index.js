@@ -191,11 +191,14 @@ function renderGamePage(selectedLevel) {
             }
         })
 
+        const remainingTime = levelTimes[selectedLevel] - savedProgress.elapsedTime
         if (timerEl) {
-            timerEl.textContent = `Осталось: ${levelTimes[selectedLevel] - savedProgress.elapsedTime} сек`
+            timerEl.textContent = `Осталось: ${remainingTime} сек`
         }
-
-        startTimer(levelTimes[selectedLevel] - savedProgress.elapsedTime)
+        startTimer(remainingTime, elapsed => {
+            gameState.elapsedTime = savedProgress.elapsedTime + elapsed
+            saveGameProgress({ selectedLevel, gameState, cardsData })
+        })
     }
 
     if (showPreview) {
@@ -227,7 +230,10 @@ function renderGamePage(selectedLevel) {
                         back.style.display = 'flex'
                     }
                 })
-                startTimer(levelTimes[selectedLevel])
+                startTimer(levelTimes[selectedLevel], elapsed => {
+                    gameState.elapsedTime = elapsed
+                    saveGameProgress({ selectedLevel, gameState, cardsData })
+                })
             }
         }, 1000)
     }

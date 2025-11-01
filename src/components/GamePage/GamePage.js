@@ -2,7 +2,6 @@ import { Card } from '../Card/Card.js'
 import { htmlToElement } from '../../utils/htmlToELement.js'
 import * as pageStyles from './GamePage.module.css'
 import { GameMenuHeader } from '../GameMenuHeader/GameMenuHeader.js'
-import { levelTimes } from '../../index.js'
 import { gameHistoryLSKey } from '../../constants.js'
 
 const images = [
@@ -116,20 +115,18 @@ export function GamePage({ selectedLevel = 'easy', onWinCallback, onLoseCallback
     const savedProgress = restoreGameProgress()
     let cardsData
     const gameState = getDefaultGameState()
-    let restoreTimestamp = Date.now()
+
     if (savedProgress && savedProgress.selectedLevel === selectedLevel && savedProgress.matchedCount < cardCount / 2) {
         cardsData = savedProgress.cardsData
         gameState.matchedCount = savedProgress.matchedCount
         gameState.matchedCards = Array.isArray(savedProgress.matchedCards) ? savedProgress.matchedCards : []
         gameState.elapsedTime = savedProgress.elapsedTime
-        restoreTimestamp = Date.now()
     } else {
         const pairCount = Math.ceil(cardCount / 2)
         const selectedImages = [...images].slice(0, pairCount)
         cardsData = [...selectedImages, ...selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)
         gameState.elapsedTime = 0
         localStorage.removeItem('activeGame')
-        restoreTimestamp = Date.now()
     }
 
     const flippedCards = []
@@ -142,7 +139,9 @@ export function GamePage({ selectedLevel = 'easy', onWinCallback, onLoseCallback
         const totalTime = gameState.elapsedTime
         saveResultToHistory({ result, difficulty: selectedLevel, duration: totalTime })
         localStorage.removeItem('activeGame')
-        clearInterval(timerInterval)
+        if (timerInterval) {
+            clearInterval(timerInterval)
+        }
         if (result === 'win') {
             onWinCallback?.()
         } else {
@@ -150,15 +149,7 @@ export function GamePage({ selectedLevel = 'easy', onWinCallback, onLoseCallback
         }
     }
 
-    const timerInterval = setInterval(() => {
-        gameState.elapsedTime += (Date.now() - restoreTimestamp) / 1000
-        gameState.elapsedTime = Math.floor(gameState.elapsedTime)
-        restoreTimestamp = Date.now()
-        saveGameProgress({ selectedLevel, gameState, cardsData })
-        if (gameState.elapsedTime >= levelTimes[selectedLevel]) {
-            endGame('lose')
-        }
-    }, 250)
+    let timerInterval = null
 
     cardsData.forEach((image, index) => {
         const cardId = `card-${index}`

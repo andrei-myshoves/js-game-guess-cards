@@ -43,7 +43,7 @@ export const getDefaultGameState = () => ({
     matchedCards: [],
 })
 
-function saveResultToHistory({ result, difficulty, duration }) {
+export function saveResultToHistory({ result, difficulty, duration }) {
     try {
         const history = JSON.parse(localStorage.getItem(gameHistoryLSKey)) || []
         history.push({
@@ -59,18 +59,37 @@ function saveResultToHistory({ result, difficulty, duration }) {
 }
 
 export function saveGameProgress({ selectedLevel, gameState, cardsData }) {
+    if (gameState.gameFinished) {
+        return
+    }
+    const progress = {
+        selectedLevel,
+        matchedCount: gameState.matchedCount,
+        elapsedTime: gameState.elapsedTime,
+        cardsData,
+        matchedCards: gameState.matchedCards,
+    }
+    localStorage.setItem('activeGame', JSON.stringify(progress))
+}
+
+export function updateGameProgress(gameState) {
+    if (gameState.gameFinished) {
+        return
+    }
+    const lastGameProgress = localStorage.getItem('activeGame')
+    if (!lastGameProgress) {
+        return
+    }
     try {
+        const parsed = JSON.parse(lastGameProgress)
         const progress = {
-            selectedLevel,
-            matchedCount: gameState.matchedCount || 0,
-            startTime: gameState.startTime || Date.now(),
-            elapsedTime: Math.floor((Date.now() - (gameState.startTime || Date.now())) / 1000),
-            cardsData: cardsData || [],
-            matchedCards: Array.isArray(gameState.matchedCards) ? gameState.matchedCards : [],
+            ...parsed,
+            matchedCards: gameState.matchedCards,
+            matchedCount: gameState.matchedCount,
         }
         localStorage.setItem('activeGame', JSON.stringify(progress))
     } catch (e) {
-        console.error('Ошибка при сохранении игры:', e)
+        console.error('Ошибка при обновлении прогресса игры:', e)
     }
 }
 
@@ -97,49 +116,61 @@ export function GamePage({ selectedLevel = 'easy', onWinCallback, onLoseCallback
     const savedProgress = restoreGameProgress()
     let cardsData
     const gameState = getDefaultGameState()
-
-    if (savedProgress && savedProgress.selectedLevel === selectedLevel) {
+    let restoreTimestamp = Date.now()
+    if (savedProgress && savedProgress.selectedLevel === selectedLevel && savedProgress.matchedCount < cardCount / 2) {
         cardsData = savedProgress.cardsData
         gameState.matchedCount = savedProgress.matchedCount
-        gameState.startTime = Date.now() - savedProgress.elapsedTime * 1000
         gameState.matchedCards = Array.isArray(savedProgress.matchedCards) ? savedProgress.matchedCards : []
+        gameState.elapsedTime = savedProgress.elapsedTime
+        restoreTimestamp = Date.now()
     } else {
         const pairCount = Math.ceil(cardCount / 2)
         const selectedImages = [...images].slice(0, pairCount)
         cardsData = [...selectedImages, ...selectedImages].slice(0, cardCount).sort(() => Math.random() - 0.5)
+        gameState.elapsedTime = 0
+        localStorage.removeItem('activeGame')
+        restoreTimestamp = Date.now()
     }
 
     const flippedCards = []
 
-    const handleWin = () => {
-        const totalTime = Math.floor((Date.now() - gameState.startTime) / 1000)
-        saveResultToHistory({ result: 'win', difficulty: selectedLevel, duration: totalTime })
+    const endGame = result => {
+        if (gameState.gameFinished) {
+            return
+        }
+        gameState.gameFinished = true
+        const totalTime = gameState.elapsedTime
+        saveResultToHistory({ result, difficulty: selectedLevel, duration: totalTime })
         localStorage.removeItem('activeGame')
-        onWinCallback?.()
+        clearInterval(timerInterval)
+        if (result === 'win') {
+            onWinCallback?.()
+        } else {
+            onLoseCallback?.()
+        }
     }
 
-    const handleLose = () => {
-        const totalTime = Math.floor((Date.now() - gameState.startTime) / 1000)
-        saveResultToHistory({ result: 'lose', difficulty: selectedLevel, duration: totalTime })
-        localStorage.removeItem('activeGame')
-        onLoseCallback?.()
-    }
-
-    const levelDuration = levelTimes[selectedLevel] * 1000
-    const remainingTime = savedProgress ? levelDuration - savedProgress.elapsedTime * 1000 : levelDuration
-    setTimeout(handleLose, remainingTime)
+    const timerInterval = setInterval(() => {
+        gameState.elapsedTime += (Date.now() - restoreTimestamp) / 1000
+        gameState.elapsedTime = Math.floor(gameState.elapsedTime)
+        restoreTimestamp = Date.now()
+        saveGameProgress({ selectedLevel, gameState, cardsData })
+        if (gameState.elapsedTime >= levelTimes[selectedLevel]) {
+            endGame('lose')
+        }
+    }, 250)
 
     cardsData.forEach((image, index) => {
         const cardId = `card-${index}`
         const card = Card(cardId, image)
         card.addEventListener('click', () => {
-            handleCardClick({ id: cardId, image, flippedCards, gameState, cardCount, onWin: handleWin })
-            saveGameProgress({ selectedLevel, gameState, cardsData })
+            handleCardClick({ id: cardId, image, flippedCards, gameState, cardCount, onWin: () => endGame('win') })
+            updateGameProgress(gameState)
         })
         cardsContainer.appendChild(card)
     })
 
-    return { container, cardsData, cardCount, gameState, loseGame: handleLose }
+    return { container, cardsData, cardCount, gameState, loseGame: () => endGame('lose') }
 }
 
 export function handleCardClick({ id, image, flippedCards, gameState, cardCount, onWin }) {

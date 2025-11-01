@@ -202,6 +202,11 @@ function renderGamePage(selectedLevel) {
     }
 
     if (showPreview) {
+        const cardsContainer = document.getElementById('cards-container')
+        if (cardsContainer) {
+            cardsContainer.style.pointerEvents = 'none'
+        }
+
         cardsData.forEach((_, index) => {
             const front = document.getElementById(`card-${index}-front`)
             const back = document.getElementById(`card-${index}-back`)
@@ -220,6 +225,11 @@ function renderGamePage(selectedLevel) {
             previewTime--
             if (previewTime < 0) {
                 clearInterval(previewInterval)
+
+                if (cardsContainer) {
+                    cardsContainer.style.pointerEvents = 'auto'
+                }
+
                 cardsData.forEach((_, index) => {
                     const front = document.getElementById(`card-${index}-front`)
                     const back = document.getElementById(`card-${index}-back`)

@@ -18,20 +18,55 @@ function getRandomStats() {
 
 export async function LeaderboardPage() {
     const container = htmlToElement(`
-        <div style="display:flex; flex-direction:column; align-items:center; margin-top:50px;">
-            <div class="loader-inner ball-pulse"><div></div><div></div><div></div></div>
-            <div>Загрузка таблицы...</div>
-        </div>
-    `)
+    <div style="display:flex; flex-direction:column; align-items:center; margin-top:50px;">
+      <style>
+        .loader {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          position: relative;
+          animation: rotate 1s linear infinite;
+        }
+        .loader::before,
+        .loader::after {
+          content: "";
+          box-sizing: border-box;
+          position: absolute;
+          inset: 0px;
+          border-radius: 50%;
+          border: 5px solid #FFF;
+          animation: prixClipFix 2s linear infinite;
+        }
+        .loader::after {
+          border-color: #FF3D00;
+          animation: prixClipFix 2s linear infinite, rotate 0.5s linear infinite reverse;
+          inset: 6px;
+        }
+        @keyframes rotate {
+          0% { transform: rotate(0deg) }
+          100% { transform: rotate(360deg) }
+        }
+        @keyframes prixClipFix {
+          0% { clip-path: polygon(50% 50%,0 0,0 0,0 0,0 0,0 0) }
+          25% { clip-path: polygon(50% 50%,0 0,100% 0,100% 0,100% 0,100% 0) }
+          50% { clip-path: polygon(50% 50%,0 0,100% 0,100% 100%,100% 100%,100% 100%) }
+          75% { clip-path: polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 100%) }
+          100% { clip-path: polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 0) }
+        }
+      </style>
+      <span class="loader"></span>
+      <div style="margin-top:10px; font-size:18px;">Загрузка таблицы...</div>
+    </div>
+  `)
 
-    if (!document.getElementById('loaders-css')) {
-        const link = document.createElement('link')
-        link.id = 'loaders-css'
-        link.rel = 'stylesheet'
-        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/loaders.css/0.1.2/loaders.min.css'
-        document.head.appendChild(link)
-    }
+    localStorage.setItem(currentPageLSKey, 'leaderboardPage')
 
+    setTimeout(() => loadLeaderboard(container), 100)
+
+    return container
+}
+
+async function loadLeaderboard(container) {
     try {
         const res = await fetch('https://jsonplaceholder.typicode.com/users')
         const users = await res.json()
@@ -48,44 +83,40 @@ export async function LeaderboardPage() {
             .sort((a, b) => b.score - a.score)
 
         const table = htmlToElement(`
-            <table border="1" style="width:100%; text-align:left; border-collapse: collapse; margin-top:20px;">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Имя</th>
-                        <th>Легкий (В/И)</th>
-                        <th>Средний (В/И)</th>
-                        <th>Тяжелый (В/И)</th>
-                        <th>Очки</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${leaderboard
-                        .map(
-                            (user, idx) => `
-                        <tr>
-                            <td>${idx + 1}</td>
-                            <td>${user.name}</td>
-                            <td>${user.wins.easy}/${user.games.easy}</td>
-                            <td>${user.wins.medium}/${user.games.medium}</td>
-                            <td>${user.wins.hard}/${user.games.hard}</td>
-                            <td>${user.score}</td>
-                        </tr>
-                    `
-                        )
-                        .join('')}
-                </tbody>
-            </table>
-        `)
+      <table border="1" style="width:90%; max-width:800px; text-align:left; border-collapse: collapse; margin-top:20px;">
+        <thead style="background:#f5f5f5;">
+          <tr>
+            <th>#</th>
+            <th>Имя</th>
+            <th>Легкий (В/И)</th>
+            <th>Средний (В/И)</th>
+            <th>Тяжелый (В/И)</th>
+            <th>Очки</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${leaderboard
+              .map(
+                  (user, idx) => `
+            <tr>
+              <td>${idx + 1}</td>
+              <td>${user.name}</td>
+              <td>${user.wins.easy}/${user.games.easy}</td>
+              <td>${user.wins.medium}/${user.games.medium}</td>
+              <td>${user.wins.hard}/${user.games.hard}</td>
+              <td>${user.score}</td>
+            </tr>
+          `
+              )
+              .join('')}
+        </tbody>
+      </table>
+    `)
 
         container.innerHTML = ''
         container.appendChild(table)
     } catch (error) {
         container.innerHTML = '<div>Ошибка при загрузке таблицы лидеров</div>'
-        console.error(error)
+        console.error('Ошибка загрузки таблицы:', error)
     }
-
-    localStorage.setItem(currentPageLSKey, 'leaderboardPage')
-
-    return container
 }

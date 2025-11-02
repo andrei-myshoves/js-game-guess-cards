@@ -286,7 +286,7 @@ document.addEventListener('visibilitychange', () => {
     }
 })
 
-window.addEventListener('DOMContentLoaded', () => {
+export function initApp() {
     const saved = restoreGameProgress()
 
     if (saved) {
@@ -297,4 +297,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const savedPage = localStorage.getItem(currentPageLSKey) || 'mainPage'
     setPage(savedPage)
-})
+}
+
+initApp()

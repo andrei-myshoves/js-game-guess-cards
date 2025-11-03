@@ -26,7 +26,6 @@ export const levelTimes = {
 
 export function setPage(page) {
     root.innerHTML = ''
-
     switch (page) {
         case 'mainPage': {
             renderMainMenu()
@@ -61,18 +60,12 @@ export function setPage(page) {
             break
         }
         case 'leaderboardPage': {
+            const mainContainer = document.getElementById('root')
+            mainContainer.innerHTML = ''
             import('./components/LeaderboardPage/LeaderboardPage.js').then(({ LeaderboardPage }) => {
-                LeaderboardPage().then(container => {
-                    const layout = Layout({
-                        title: 'Таблица лидеров',
-                        children: container,
-                        showBack: true,
-                    })
-                    root.innerHTML = ''
-                    root.appendChild(layout)
-
-                    document.getElementById('backBtn')?.addEventListener('click', () => setPage('mainPage'))
-                })
+                const page = LeaderboardPage()
+                mainContainer.appendChild(page)
+                document.getElementById('backBtn')?.addEventListener('click', () => setPage('mainPage'))
             })
             break
         }

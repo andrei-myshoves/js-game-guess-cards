@@ -1,0 +1,35 @@
+.loaderWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 12px;
+}
+
+.loader {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    position: relative;
+    animation: rotate 1s linear infinite;
+}
+
+.loader::before,
+.loader::after {
+    content: '';
+    box-sizing: border-box;
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 5px solid var(--loader-gray);
+    animation: prix-clip-fix 2s linear infinite;
+}
+
+.loader::after {
+    border-color: var(--loader-accent);
+    animation:
+        prix-clip-fix 2s linear infinite,
+        rotate 0.5s linear infinite reverse;
+    inset: 6px;
+}

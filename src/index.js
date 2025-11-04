@@ -13,6 +13,7 @@ import { startTimer, stopTimer, pauseTimer, resumeTimer } from './components/Tim
 import { Button } from './components/Button/Button.js'
 import { GameRules } from './components/GameRules/GameRules.js'
 import { HistoryGame } from './components/HistoryGame/HistoryGame.js'
+import { LeaderboardPage } from './components/LeaderboardPage/LeaderboardPage.js'
 import './style.css'
 import { selectedLevelLSKey, currentPageLSKey, gameHistoryLSKey } from './constants.js'
 
@@ -62,11 +63,8 @@ export function setPage(page) {
         case 'leaderboardPage': {
             const mainContainer = document.getElementById('root')
             mainContainer.innerHTML = ''
-            import('./components/LeaderboardPage/LeaderboardPage.js').then(({ LeaderboardPage }) => {
-                const page = LeaderboardPage()
-                mainContainer.appendChild(page)
-                document.getElementById('backBtn')?.addEventListener('click', () => setPage('mainPage'))
-            })
+            LeaderboardPage(mainContainer)
+            document.getElementById('backBtn')?.addEventListener('click', () => setPage('mainPage'))
             break
         }
         case 'settingsPage': {

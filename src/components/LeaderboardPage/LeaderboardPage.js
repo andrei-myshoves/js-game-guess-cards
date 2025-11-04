@@ -1,6 +1,9 @@
 import { Layout } from '../Layout/Layout.js'
 import { htmlToElement } from '../../utils/htmlToELement.js'
 import * as styles from './LeaderboardPage.module.css'
+import { Loader } from '../Loader/Loader.js'
+
+const API_USERS = 'https://jsonplaceholder.typicode.com/users'
 
 function randInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min
@@ -53,17 +56,15 @@ function buildTableHtml(leaderboard) {
   `
 }
 
-export function LeaderboardPage() {
+export function LeaderboardPage(mainContainer) {
     const content = htmlToElement(`
-    <div class="${styles.container}">
-      <div class="${styles.loaderWrapper}">
-        <div class="${styles.loader}"></div>
+      <div class="${styles.container}">
+        ${Loader()}
+        <p class="${styles.loadingText}">Загрузка таблицы...</p>
       </div>
-      <p class="${styles.loadingText}">Загрузка таблицы...</p>
-    </div>
-  `)
+    `)
 
-    fetch('https://jsonplaceholder.typicode.com/users')
+    fetch(API_USERS)
         .then(res => {
             if (!res.ok) {
                 throw new Error('Network response was not ok')
@@ -71,18 +72,10 @@ export function LeaderboardPage() {
             return res.json()
         })
         .then(users => {
-            console.log(users)
-
             const leaderboard = users
                 .map(u => {
                     const s = makeStats()
-                    return {
-                        id: u.id,
-                        name: u.name,
-                        games: s.games,
-                        wins: s.wins,
-                        score: s.score,
-                    }
+                    return { id: u.id, name: u.name, games: s.games, wins: s.wins, score: s.score }
                 })
                 .sort((a, b) => b.score - a.score)
 
@@ -97,9 +90,11 @@ export function LeaderboardPage() {
             content.innerHTML = `<p class="${styles.error}">Ошибка при загрузке таблицы лидеров</p>`
         })
 
-    return Layout({
+    const page = Layout({
         title: 'Таблица лидеров',
         children: content,
         showBack: true,
     })
+
+    mainContainer.appendChild(page)
 }

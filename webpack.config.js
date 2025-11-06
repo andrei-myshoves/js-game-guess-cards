@@ -13,6 +13,17 @@ module.exports = env => {
             filename: '[name].[contenthash].js',
             clean: true,
         },
+        resolve: {
+            alias: {
+                '@': path.resolve(__dirname, 'src'),
+                '@components': path.resolve(__dirname, 'src/components'),
+                '@utils': path.resolve(__dirname, 'src/utils'),
+                '@pages': path.resolve(__dirname, 'src/pages'),
+                '@constants': path.resolve(__dirname, 'src/constants.js'),
+                '@style': path.resolve(__dirname, 'src/style.css'),
+            },
+            extensions: ['.js', '.json', '.css'],
+        },
         module: {
             rules: [
                 // CSS Modules только для *.module.css

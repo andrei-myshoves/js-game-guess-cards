@@ -1,7 +1,7 @@
-import { Layout } from '../Layout/Layout.js'
-import { htmlToElement } from '../../utils/htmlToELement.js'
+import { Layout } from '@components/Layout/Layout'
+import { htmlToElement } from '@utils/htmlToELement'
 import * as styles from './LeaderboardPage.module.css'
-import { Loader } from '../Loader/Loader.js'
+import { Loader } from '@components/Loader/Loader'
 
 const API_USERS = 'https://jsonplaceholder.typicode.com/users'
 

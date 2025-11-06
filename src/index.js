@@ -1,6 +1,6 @@
-import { GameMenu, menuItems } from './components/GameMenu/GameMenu.js'
-import { GameSettingsMenu } from './components/GameMenuSettings/GameMenuSettings.js'
-import { Layout } from './components/Layout/Layout.js'
+import { GameMenu, menuItems } from '@components/GameMenu/GameMenu'
+import { GameSettingsMenu } from '@components/GameMenuSettings/GameMenuSettings'
+import { Layout } from '@components/Layout/Layout'
 import {
     GamePage,
     handleCardClick,
@@ -8,14 +8,14 @@ import {
     saveGameProgress,
     generateCards,
     getDefaultGameState,
-} from './components/GamePage/GamePage.js'
-import { startTimer, stopTimer, pauseTimer, resumeTimer } from './components/Timer/Timer.js'
-import { Button } from './components/Button/Button.js'
-import { GameRules } from './components/GameRules/GameRules.js'
-import { HistoryGame } from './components/HistoryGame/HistoryGame.js'
-import { LeaderboardPage } from './components/LeaderboardPage/LeaderboardPage.js'
-import './style.css'
-import { selectedLevelLSKey, currentPageLSKey, gameHistoryLSKey } from './constants.js'
+} from '@components/GamePage/GamePage'
+import { startTimer, stopTimer, pauseTimer, resumeTimer } from '@components/Timer/Timer'
+import { Button } from '@components/Button/Button'
+import { GameRules } from '@components/GameRules/GameRules'
+import { HistoryGame } from '@components/HistoryGame/HistoryGame'
+import { LeaderboardPage } from '@components/LeaderboardPage/LeaderboardPage'
+import '@style'
+import { selectedLevelLSKey, currentPageLSKey, gameHistoryLSKey } from '@constants'
 
 const root = document.getElementById('root')
 

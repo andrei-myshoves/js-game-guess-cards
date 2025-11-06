@@ -1,6 +1,6 @@
 import * as styles from './GameMenuSettings.module.css'
-import { Button } from '../Button/Button.js'
-import { htmlToElement } from '../../utils/htmlToELement.js'
+import { Button } from '@components/Button/Button'
+import { htmlToElement } from '@utils/htmlToELement'
 
 export const difficultyLevels = [
     { id: 'easy', text: 'Лёгкая', extraClass: styles.buttonEasy },

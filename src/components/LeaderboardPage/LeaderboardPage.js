@@ -40,19 +40,21 @@ function buildTableHtml(leaderboard) {
         .join('')
 
     return `
-    <table class="${styles.table}">
-      <thead>
-        <tr>
-          <th class="${styles.header}">#</th>
-          <th class="${styles.header}">Имя</th>
-          <th class="${styles.header}">Лёгкий (В/И)</th>
-          <th class="${styles.header}">Средний (В/И)</th>
-          <th class="${styles.header}">Тяжёлый (В/И)</th>
-          <th class="${styles.header}">Очки</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
+    <div class="${styles.tableWrapper}">
+      <table class="${styles.table}">
+        <thead>
+          <tr>
+            <th class="${styles.header}">#</th>
+            <th class="${styles.header}">Имя</th>
+            <th class="${styles.header}">Лёгкий (В/И)</th>
+            <th class="${styles.header}">Средний (В/И)</th>
+            <th class="${styles.header}">Тяжёлый (В/И)</th>
+            <th class="${styles.header}">Очки</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
   `
 }
 

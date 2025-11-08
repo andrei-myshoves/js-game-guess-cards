@@ -1,5 +1,5 @@
 import * as styles from './Button.module.css'
-import { htmlToElement } from '@utils/htmlToELement'
+import { htmlToElement } from '@/utils/htmlToELement'
 
 export function Button({ id, text, extraClass = '' }) {
     return htmlToElement(`

@@ -1,5 +1,5 @@
 import * as styles from './Card.module.css'
-import { htmlToElement } from '@utils/htmlToELement.js'
+import { htmlToElement } from '@/utils/htmlToELement'
 
 export function Card(id, image) {
     return htmlToElement(`

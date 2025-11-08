@@ -1,6 +1,6 @@
 import * as styles from './Header.module.css'
-import { Button } from '@components/Button/Button'
-import { htmlToElement } from '@utils/htmlToELement'
+import { Button } from '@/components/Button/Button'
+import { htmlToElement } from '@/utils/htmlToELement'
 
 export function Header(title = '', showBack = false) {
     const backBtn = showBack ? Button({ id: 'backBtn', text: 'Назад', extraClass: styles.buttonBack }).outerHTML : ''

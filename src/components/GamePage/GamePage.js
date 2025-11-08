@@ -1,8 +1,8 @@
-import { Card } from '@components/Card/Card'
-import { htmlToElement } from '@utils/htmlToELement'
+import { Card } from '@/components/Card/Card'
+import { htmlToElement } from '@/utils/htmlToELement'
 import * as pageStyles from './GamePage.module.css'
-import { GameMenuHeader } from '@components/GameMenuHeader/GameMenuHeader'
-import { gameHistoryLSKey } from '@constants'
+import { GameMenuHeader } from '@/components/GameMenuHeader/GameMenuHeader'
+import { gameHistoryLSKey } from '@/constants'
 
 const images = [
     '/img/Air.webp',

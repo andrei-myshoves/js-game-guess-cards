@@ -1,5 +1,5 @@
-import { Header } from '@components/Header/Header'
-import { htmlToElement } from '@utils/htmlToELement'
+import { Header } from '@/components/Header/Header'
+import { htmlToElement } from '@/utils/htmlToELement'
 import * as styles from './Layout.module.css'
 
 export function Layout({ title = '', children = '', showBack = false }) {

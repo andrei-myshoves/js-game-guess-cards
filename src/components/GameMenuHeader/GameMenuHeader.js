@@ -1,4 +1,4 @@
-import { htmlToElement } from '@utils/htmlToELement'
+import { htmlToElement } from '@/utils/htmlToELement'
 import * as styles from './GameMenuHeader.module.css'
 
 export function GameMenuHeader() {

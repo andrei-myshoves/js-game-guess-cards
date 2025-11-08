@@ -1,6 +1,6 @@
-import { htmlToElement } from '@utils/htmlToELement'
+import { htmlToElement } from '@/utils/htmlToELement'
 import * as styles from './GameRules.module.css'
-import { levels } from '@components/GamePage/GamePage'
+import { levels } from '@/components/GamePage/GamePage'
 import { levelTimes } from '@/index'
 
 const rules = [

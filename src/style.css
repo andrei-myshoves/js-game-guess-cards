@@ -98,4 +98,11 @@ h6 {
     --foreground-accent-hover: #cfe907;
     --dificult-setting-accent-hover: #f9f9f9;
     --button-clear-bg: #ef4444;
+    --loader-gray: #e0e0e0;
+    --loader-accent: #ff3d00;
+    --table-border: #444;
+    --table-header-bg: #bec1be;
+    --text-main: #000;
+    --text-light: #fff;
+    --text-error: #f66;
 }

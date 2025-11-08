@@ -13,6 +13,7 @@ import { startTimer, stopTimer, pauseTimer, resumeTimer } from './components/Tim
 import { Button } from './components/Button/Button.js'
 import { GameRules } from './components/GameRules/GameRules.js'
 import { HistoryGame } from './components/HistoryGame/HistoryGame.js'
+import { LeaderboardPage } from './components/LeaderboardPage/LeaderboardPage.js'
 import './style.css'
 import { selectedLevelLSKey, currentPageLSKey, gameHistoryLSKey } from './constants.js'
 
@@ -26,7 +27,6 @@ export const levelTimes = {
 
 export function setPage(page) {
     root.innerHTML = ''
-
     switch (page) {
         case 'mainPage': {
             renderMainMenu()
@@ -58,6 +58,13 @@ export function setPage(page) {
                     pageName: 'mainPage',
                 })
             }
+            break
+        }
+        case 'leaderboardPage': {
+            const mainContainer = document.getElementById('root')
+            mainContainer.innerHTML = ''
+            LeaderboardPage(mainContainer)
+            document.getElementById('backBtn')?.addEventListener('click', () => setPage('mainPage'))
             break
         }
         case 'settingsPage': {

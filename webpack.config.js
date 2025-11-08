@@ -13,6 +13,12 @@ module.exports = env => {
             filename: '[name].[contenthash].js',
             clean: true,
         },
+        resolve: {
+            alias: {
+                '@': path.resolve(__dirname, 'src'),
+            },
+            extensions: ['.js', '.json', '.css'],
+        },
         module: {
             rules: [
                 // CSS Modules только для *.module.css

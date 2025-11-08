@@ -1,6 +1,6 @@
 import * as styles from './GameMenu.module.css'
-import { Button } from '../Button/Button.js'
-import { htmlToElement } from '../../utils/htmlToELement.js'
+import { Button } from '@/components/Button/Button'
+import { htmlToElement } from '@/utils/htmlToELement'
 
 export const menuItems = [
     { id: 'gamePage', text: 'Начать игру', extraClass: styles.buttonStart },

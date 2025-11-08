@@ -1,4 +1,4 @@
-import { setPage } from '../../index.js'
+import { setPage } from '@/index'
 
 let intervalId = null
 let remainingTime = 0

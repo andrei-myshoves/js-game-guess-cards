@@ -1,7 +1,7 @@
-import { htmlToElement } from '../../utils/htmlToELement.js'
+import { htmlToElement } from '@/utils/htmlToELement'
 import * as styles from './GameRules.module.css'
-import { levels } from '../GamePage/GamePage.js'
-import { levelTimes } from '../../index.js'
+import { levels } from '@/components/GamePage/GamePage'
+import { levelTimes } from '@/index'
 
 const rules = [
     '🔍 Найдите все пары одинаковых карточек.',

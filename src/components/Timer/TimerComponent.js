@@ -1,4 +1,4 @@
-import { htmlToElement } from '../../utils/htmlToELement.js'
+import { htmlToElement } from '@/utils/htmlToELement'
 import * as styles from './TimerComponent.module.css'
 
 export function TimerComponent() {

@@ -1,8 +1,8 @@
-import { Layout } from '../Layout/Layout.js'
-import { Button } from '../Button/Button.js'
-import { htmlToElement } from '../../utils/htmlToELement.js'
+import { Layout } from '@/components/Layout/Layout'
+import { Button } from '@/components/Button/Button'
+import { htmlToElement } from '@/utils/htmlToELement'
 import * as styles from './HistoryGame.module.css'
-import { gameHistoryLSKey } from '../../constants.js'
+import { gameHistoryLSKey } from '@/constants'
 
 const difficultyLabels = {
     easy: 'Лёгкий',

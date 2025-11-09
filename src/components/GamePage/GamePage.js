@@ -169,14 +169,13 @@ export function handleCardClick({ id, image, flippedCards, gameState, cardCount,
         return
     }
 
-    const cardFront = document.getElementById(`${id}-front`)
-    const cardBack = document.getElementById(`${id}-back`)
-    if (!cardFront || !cardBack || cardFront.style.display === 'block') {
+    const cardElement = document.getElementById(id)
+    if (!cardElement || cardElement.dataset.flipped === 'true') {
         return
     }
 
-    cardFront.style.display = 'block'
-    cardBack.style.display = 'none'
+    cardElement.classList.add('flipped')
+    cardElement.dataset.flipped = 'true'
     flippedCards.push({ cardId: id, image })
 
     if (flippedCards.length === 2) {
@@ -188,6 +187,9 @@ export function handleCardClick({ id, image, flippedCards, gameState, cardCount,
             const firstIndex = parseInt(first.cardId.split('-')[1], 10)
             const secondIndex = parseInt(second.cardId.split('-')[1], 10)
             gameState.matchedCards.push(firstIndex, secondIndex)
+
+            document.getElementById(first.cardId)?.classList.add('matched')
+            document.getElementById(second.cardId)?.classList.add('matched')
 
             flippedCards.length = 0
             gameState.locked = false
@@ -201,13 +203,10 @@ export function handleCardClick({ id, image, flippedCards, gameState, cardCount,
         } else {
             setTimeout(() => {
                 flippedCards.forEach(c => {
-                    const f = document.getElementById(`${c.cardId}-front`)
-                    const b = document.getElementById(`${c.cardId}-back`)
-                    if (f) {
-                        f.style.display = 'none'
-                    }
-                    if (b) {
-                        b.style.display = 'flex'
+                    const cardEl = document.getElementById(c.cardId)
+                    if (cardEl) {
+                        cardEl.classList.remove('flipped')
+                        cardEl.dataset.flipped = 'false'
                     }
                 })
                 flippedCards.length = 0

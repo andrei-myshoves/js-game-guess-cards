@@ -179,21 +179,16 @@ function renderGamePage(selectedLevel) {
         const matchedCards = Array.isArray(savedProgress.matchedCards) ? savedProgress.matchedCards : []
 
         cardsData.forEach((image, index) => {
-            const front = document.getElementById(`card-${index}-front`)
-            const back = document.getElementById(`card-${index}-back`)
+            const card = document.getElementById(`card-${index}`)
             if (matchedCards.includes(index)) {
-                if (front) {
-                    front.style.display = 'block'
-                }
-                if (back) {
-                    back.style.display = 'none'
+                if (card) {
+                    card.classList.add('flipped')
+                    card.dataset.flipped = 'true'
                 }
             } else {
-                if (front) {
-                    front.style.display = 'none'
-                }
-                if (back) {
-                    back.style.display = 'flex'
+                if (card) {
+                    card.classList.remove('flipped')
+                    card.dataset.flipped = 'false'
                 }
             }
         })
@@ -215,13 +210,10 @@ function renderGamePage(selectedLevel) {
         }
 
         cardsData.forEach((_, index) => {
-            const front = document.getElementById(`card-${index}-front`)
-            const back = document.getElementById(`card-${index}-back`)
-            if (front) {
-                front.style.display = 'block'
-            }
-            if (back) {
-                back.style.display = 'none'
+            const card = document.getElementById(`card-${index}`)
+            if (card) {
+                card.classList.add('flipped')
+                card.dataset.flipped = 'true'
             }
         })
 
@@ -238,13 +230,10 @@ function renderGamePage(selectedLevel) {
                 }
 
                 cardsData.forEach((_, index) => {
-                    const front = document.getElementById(`card-${index}-front`)
-                    const back = document.getElementById(`card-${index}-back`)
-                    if (front) {
-                        front.style.display = 'none'
-                    }
-                    if (back) {
-                        back.style.display = 'flex'
+                    const card = document.getElementById(`card-${index}`)
+                    if (card) {
+                        card.classList.remove('flipped')
+                        card.dataset.flipped = 'false'
                     }
                 })
                 startTimer(levelTimes[selectedLevel], elapsed => {

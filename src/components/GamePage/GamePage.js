@@ -153,7 +153,7 @@ export function GamePage({ selectedLevel = 'easy', onWinCallback, onLoseCallback
 
     cardsData.forEach((image, index) => {
         const cardId = `card-${index}`
-        const card = Card(cardId, image)
+        const card = Card(cardId, image, index)
         card.addEventListener('click', () => {
             handleCardClick({ id: cardId, image, flippedCards, gameState, cardCount, onWin: () => endGame('win') })
             updateGameProgress(gameState)

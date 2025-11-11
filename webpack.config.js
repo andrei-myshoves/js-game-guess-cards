@@ -2,6 +2,7 @@ const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin')
 
 module.exports = env => {
     const isProd = env.mode === 'production'
@@ -62,6 +63,9 @@ module.exports = env => {
         plugins: [
             new HtmlWebpackPlugin({ template: path.resolve(__dirname, 'public', 'index.html') }),
             ...(isProd ? [new MiniCssExtractPlugin({ filename: '[name].[contenthash].css' })] : []),
+            new CopyPlugin({
+                patterns: [{ from: 'public', to: '', globOptions: { ignore: ['**/index.html'] } }],
+            }),
         ],
         devServer: {
             static: {

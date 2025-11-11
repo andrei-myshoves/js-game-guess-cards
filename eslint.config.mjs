@@ -22,6 +22,7 @@ export default defineConfig([
             'arrow-body-style': ['error', 'as-needed'],
             curly: ['error', 'all'],
             'add-curly/add-curly': 'error',
+            'eslintmarkdown/no-missing-label-refs': 'off',
         },
         languageOptions: {
             globals: { ...globals.browser, ...globals.node },
